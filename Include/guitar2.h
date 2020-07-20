@@ -66,7 +66,7 @@
 　□謝辞 
 
 
-　- コードポジションは、以下のページ様を参照しています。-
+　コードポジションは、以下のページ様を参照しています。
 
 　http://www9.ocn.ne.jp/~knatsu/chords/chords.html
 　http://www.ishibashi.co.jp/academic/Chord_Guitar/C.htm
@@ -75,7 +75,6 @@
 　http://www.naru-gakki.com/guitar-opentuning/
 　http://guitar-hakase.com/tuning/
 　http://www.aki-f.com/kouza/b_kouza/kouza5/kouza5_2.htm
-
  
 　□履歴 
 
@@ -108,7 +107,7 @@
      7	1	5.0c系から必要な機能のみ移植した
 		(～)によるコマンド記述はセキュリティ的に不利なため廃止
 		引数マクロの""抜けエラー修正
-	2	ドキュメントの修正
+	2	ドキュメント直した
 	4	処理の最適化
 	14	mM7b5を追加した
  
@@ -139,7 +138,7 @@
 //　　F#m7b5  -> Fsm7b5
 //　　Bm7#5   -> Bm7s5
 //　　Abb9#11 -> Abb9s11
-	 
+	
 　- guitar.h互換 / ストローク - 
 
 
@@ -384,12 +383,15 @@
 　　GSは、モタリ感のない、ソリッドなタイミングにします。
 　　GMは、旧バージョンのサウンドを再現します。
 
+
 　■#Mode_set= "std" //default
 
 　cutやarp記述を省くときに使用します。
+
 　A7("d^^u",cut)
 
-　-> #Mode_set="cut" A7("d^^u")
+　->#Mode_set="cut"
+　->A7("d^^u")
 
 // std | prn     | print     | result     |
 // cut | cut_prn | cut_print | cut_result |
@@ -401,26 +403,32 @@
 　　#Arp_set= "r323 1232"
 
 　繰り返しの演奏指定を省くなどで使用します。
+
 　A7("d^^u",cut)
 
-　-> #Cut_set={d^^u} #Mode_set="cut" A7
-
+　->#Cut_set={d^^u}
+　->#Mode_set="cut"
+　->A7
 
 
 　■#Sum_chg= "on" //default [on | msg | off]
 
 　通常は、ルート弦を自動アサインしますが、
 
-　ルートを弾くサムの自動アサインの解除、
-　もしく変更メッセージ付きに切替えます。
+　自動アサインせず、手動指定の場合、"off"にします。
+　もしく変更メッセージ付き"msg"に切替えます。
 
 
 
 　■#Down_set= "2" //default
 　　#Up_set  = "2"
 
-　指定がない時のバラつきの速度を変更します
-　A7({d(2)^^u2},cut) -> #Down_set= "4" A7({d(4)^^u2},cut)
+　デフォルトのバラつきの速度を変更します。
+
+　A7({d(バラつき2)^^u2},cut)
+
+　->#Down_set= "4"
+　->A7({d(バラつき4)^^u2},cut)
 
 
 
@@ -434,24 +442,24 @@
 
 
 
-　-- デフォルト変更例 --
+　-- マクロ変更例 --
 
  Include(guitar2.h)
 
   @26 q94 l8 o3
 
-　#Tune_set= "openG";         // openGへ変更
-　#Mode_set= "cut";           // モード変更
+　#Tune_set= "openG";		// openGへ変更
+　#Mode_set= "cut";		// モード変更
 
-　[ Am |Dm7 |Em7 : | FM7("d4^ ^^^^ u4r ") ] l1 FM7("d5") l8
+　[ Am Dm7 Em7 : FM7("d4^ ^^^^ u4r ") ] l1 FM7("d5") l8
 
   @25 q97
 
-  #Tune_set= "openDm";
-  #Mode_set="arp";
-  #Arp_set="r131 u212";
+  #Tune_set= "openDm";		// openDmへ変更
+  #Mode_set="arp";		// モード変更
+  #Arp_set="r131 u212";		// 演奏指定
 
-  [ Am9 |Gbm9 |Gm9 : |Abm9 ] Abm9
+  [ Am9 Gbm9 Gm9 : Abm9 ] Abm9
 
 
 
@@ -505,18 +513,20 @@
 
 　-- 各種凡例 --
 
+　//Cut
 　l8 v77 Fadd9({ [4 d4u3[d3u2]:d6u5] },cut)
 　l8 v77 Fadd9({ [@28,0 q66 du2 Key(-5)@29 <v-11 d> Key=0 ] },cut)
 
+　//Arp
 　l8 Em7b5({ [r321 ^: 232] 321 },arp)
 　l8 Em7b5({ r 323 > v-11 @29,0 Key=7 'u t6 1' Key(0)< },arp)
 
+　//Chdprint
 　Chdprint("x02 55x  N")
 　Chdprint(,prn,"x02 55x  N")
 
 　Chdprint({d^du},cut,"r2-1 102  C")
 　Chdprint({r321},arp,"s2-1 102  C")
-
  
 　□使用上の制限 
 
@@ -530,14 +540,14 @@
 　　記号、アルファベットが混在するため、
 　　string扱いでなければ、エラーとなるためです。
 
-　　Am7(du^u) -> Am7("du^u") or Am7({du^u})
-　　Am7(r1^3) -> Am7("r1^3") or Am7({r1^3})
+　　Am7(du^u)	->Am7("du^u") or Am7({du^u})
+　　Am7(r1^3)	->Am7("r1^3") or Am7({r1^3})
  
 　■print機能について 
 
 
-　　Printコマンドとの衝突を避けるため、
-　　使用する際は、小文字でprintと記載のこと。
+　　"Print"コマンドとの衝突を避けるため、
+　　使用する際は、小文字で"print"と記載のこと。
 
 　　-> Am(3,print)
  
@@ -548,10 +558,10 @@
 　　このため、音色チェンジが遅れることがあります。
 
 　　この場合は、あらかじめ音色を変えておく、
-　　ないし、戻し休符などを使い対応して下さい。
+　　ないし戻し休符などを使い、対応して下さい。
 
-　　-> r%-4 @25 r%4  Em7
-　　-> r%-4 @26 r%4  FM7
+　　->r%-4 @25 r%4  Em7
+　　->r%-4 @26 r%4  FM7
  
 　■アルペジオの仕様 
 
@@ -559,30 +569,31 @@
 　　アルペジオは、弦が2本以下となる場合、
 　　出力しない仕様です。
 
-　　-> Fpw2("r1^1",arp,6) // 2弦のみだと、エラー出力
+　　->Fpw2("r1^1",arp,6) // 2弦のみだと、エラー出力
 
 
 　　アルペジオでは、4弦コードであれば、
 　　細い弦から、1,2,3,rと自動でアサインされます。このため、
 
 　　4弦コードで、[h]や[u]がない場合、
+
 　　自動的に[r]が、[h],[u]の代りに差換えられる仕様となっています。
 
 　　Am7("rhu 321",arp_prn,4)
 
-　　-> arp :rhu321 | x, x, `a, ``e, ``g, ```c
-　　-> `a`a`a``e``g```c
+　　->arp :rhu321 | x, x, `a, ``e, ``g, ```c
+　　->`a`a`a``e``g```c
 
-　　Am7("rhu321",arp_prn,5) //5弦の場合、[h]は[u]に差換え
+　　Am7("rhu321",arp_prn,5) //5弦の場合は、[h]は[u]に差換え
 
-　　-> arp :rhu321 | x, a, `e, `g, ``c, ``e
-　　-> a`e`e`g``c``e
+　　->arp :rhu321 | x, a, `e, `g, ``c, ``e
+　　->a`e`e`g``c``e
  
 　■アルペジオとループカウンタ 
 
 
 　　アルペジオでは、数字を使うため、
-　　記述によっては、ループカウンタの数字と見分けがつきません。
+　　記述によってはループカウンタの数字と、見分けがつきません。
 
 　　これを避けるため、空白で明示的に分離する必要があります。
 
@@ -590,7 +601,7 @@
 　　-> [ 123r]  // [空白 123]
 　　-> [4 123r] // [4空白 123r]
  
-　■Chdprintの左寄せ記述 
+　■Chdprintの左寄せ記述について 
 
 
 　　Chdprintでは、左側ふたつに記述がない場合、
@@ -607,12 +618,12 @@
 */ 
   
 /*　　クイックリファレンス 
-	 
+	
 　□指定できるコードリスト 
 
   [# は、sへ置き換える]
 　[pwはギターリフで、omit3コード]
-  [(A711)指定可 ->A7sus4へ自動差換えします]
+  [(A711)指定可 ->A7sus4へ自動差換え]
 
  　A     |AM7  |AM79   |(AM9)   |AM7s11 |AM713  |AM913
    Am    |Am7  |Am79   |(Am9)   |Am711  |Am911
@@ -659,12 +670,12 @@
   openDm | dropD | nash(ville) | DADGAD |
 
  
-　□出力機能早見表 
+　□出力早見表 
 
-　A7(3,2,6)  // guitar.h互換ストローク
-　G7(,prn,6) // コンソール出力
-　F7("d^du",cut,6) // カッティング
-　E7("r321",arp,5) // アルペジオ
+　A7(3,2,6)	// guitar.h互換ストローク
+　G7(,prn,6)	// コンソール出力
+　F7("d^du",cut,6)	// カッティング
+　E7("r321",arp,5)	// アルペジオ
 
 　Chdprint(-5,2,"x02 55x  N")
 　Chdprint(,prn,"r2-1 102 C")
@@ -681,36 +692,37 @@
 　■ストローク / guitar.h互換 
 
 　Include(guitar2.h);
-　@27 q93 o3 Time=(!4) l2
 
-　Em7b5 A7(11) | Dm7 G7(-5,,6) | C(12,1,5)
+　@27 q93 o3 Time=(!4) l2
+　Em7b5 A7(11)  Dm7 G7(-5,,6)  C(12,1,5)
  
 　■カッティング Cutting 
 
 　Include(guitar2.h);
-　@26 o3 q96 v99 Time=(!4) l8 #Mode_set="cut"
 
+　@26 o3 q96 v99 Time=(!4) l8 #Mode_set="cut"
 　E7sus4
+
 　Am("l8 d^d^ v88 q18 d3u2^^^")
  
 　■アルペジオ Arpeggio 
 
 　Include(guitar2.h);
 　@25 o3 q108 Time=(!4) l8 #Mode_set="arp"
-
 　E7sus4
+
   Am("r t+1 232 1 t-1 232 u^^^")
  
 　■ダイアグラム呼出し Chdprint 
 
 　Include(guitar2.h);
-　@27 o3 v99 Time=(!4) l8
 
+　@27 o3 v99 Time=(!4) l8
 　Chdprint(" x02 55x  N") // ナットモード
 　Chdprint("r2-1 102  C") // キー指定モード
 
-　q108 Chdprint("[r323 123:2]2^^^",arp,"x02 55x  N")
-　q96  Chdprint("[d^d:u^udu]u^^^^",cut,"r21 1xx  B")
+　q108 Chdprint(" [r323 123:2]2^^^ ",arp,"x02 55x  N")
+　q96  Chdprint(" [d^d:u^udu]u^^^^ ",cut,"r21 1xx  B")
   
 　□基本雛型 
 
@@ -718,23 +730,29 @@
 　Include(guitar2.h)
 　Time=(!2)
 
-  #TT= { Dm7b5 |　E7 |　Am7 |　D7 }
+
+　//カッティング//
 
 　#Mode_set="cut"
 　#Cut_set={ d^du ^udu }
-　r%-4 @26 o3 q93 v86 l8 r%4
 
-  #TT
+　r%-4 @26 o3 q93 v86 l8 r%4
+  Dm7b5 E7 Am7 D7
+
+
+　//アルペジオ//
 
 　#Mode_set="arp"
 　#Arp_set={ r131 2131 }
+
 　r%-4 @25 o3 q115 v106 l8 r%4
+  Dm7b5 E7 Am7 D7
 
-  #TT
 
-　Chdprint({ d^du },cut,"577 655 N")
-　Chdprint({ r321 },arp,"r22 100 A")
+　//Chdprintのバッキング//
 
+　Chdprint(" d^du ",cut,"577 655 N")
+　Chdprint(" r321 ",arp,"r22 100 A")
  
 */ 
   
@@ -1816,7 +1834,7 @@ Function Chdprint(Str Junban,Str Cnv,Str Pos){
    
 //	guitar2.h ------ 
 
-	 
+	
 Function OPEN_TUNING(Str Tune,""){ 
 
 	Array Tuning;
@@ -2539,7 +2557,7 @@ Function PI_CHDLIST(Int Rootkey,Str Chdname,Str Junban,Str Cnv,Str Vce){
 
  } //func
 
-  
+  	
 // Chord Functionマクロ 
 
 
@@ -2647,7 +2665,7 @@ Function PI_CHDLIST(Int Rootkey,Str Chdname,Str Junban,Str Cnv,Str Vce){
 
 
 
-	 
+	
 　□テンションコード 
 
 
@@ -2723,7 +2741,7 @@ Function PI_CHDLIST(Int Rootkey,Str Chdname,Str Junban,Str Cnv,Str Vce){
 　　良いかもしれません。
 
 　　G7b9    -> G#dim7
- 	
+ 
 　□演奏技法との兼ね合い 
 
 
@@ -3095,8 +3113,8 @@ Function PI_CHDLIST(Int Rootkey,Str Chdname,Str Junban,Str Cnv,Str Vce){
 
 
 
-   
- 　　詳細説明終わり　*/ 
+  
+*/ 
 
 
- 
+  
