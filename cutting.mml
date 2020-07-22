@@ -1,0 +1,71 @@
+MetaText  ={"                                                  '56秒 - `20 7/ 20'"} 
+TrackName ={"16beat / cutting"}
+Copyright ={"04coreworks / Composer: 黄白紅藍玄"}
+
+//-- guitar2.hが必要です
+//-- XPのみで確認、sakura,TW両対応
+//-- 構造化エディタ対応です
+ 
+Include(gs.h) ResetGS()r4 
+//Include(tuner2.h) Eq_tune({4-g},"443")r4
+Include(guitar2.h)
+TimeBase=120
+
+//  ReverbSetting      Time Dpth High  Mix
+    CuePoint={"TwmParam( 33, 111,  88, 99)"} // Def.(127,117,0,127)
+
+Tempo=(42*4+6)
+//Tempo = 166
+Time=(!1) TrackSync
+ 
+//Dm7 | CM7| BbM7(FM7)| CM7 
+//Em  | D  | C   | D
+
+
+#CC="        d^^  v_-25 u  du ^u  ^u d^d"; #DD= " v_+20 u^^ v_0"
+#EE=" v_-15  d^^^ v_-15    d^ ^u  ^u dud"; #FF= " v_+20 u^^ v_0"
+
+
+#TW= "Am711(#CC) Em711(#DD) CM79(#EE)   Em711(#FF)"
+#TS= "Dm711(#CC) F711(#DD)  BbM913(#EE) Eb79(#FF)"			// Em G7 C F7
+#TN= "Am79(#CC,,6) Em711(#DD,,6) CM79(#EE,,5) Em79(#FF,,6)"
+#TQ= "Fm79(#CC,,6) Ebm79(#DD)    DbM913(#EE)  Bbm711(#FF)"		//全音下降
+
+//#TQ={ Em("du (Key(3) ^^^u",cut_print) }
+#Mode_set="cut"
+//#Cut_set={ d^du ^udu }
+
+ Key=-1
+
+TR=2 V=100 REV= 55 P=64 r%-3 @29,0 v108 q101 o3 r%2 t__2=4 q__2(!24) l8
+[#TW][#TS][#TN][#TQ]  [#TW]
+ 
+#TT={	l16 
+	Sub{ rrdg|trdg|rrpr| rrpr|  dkkk| trdg| rrtr| rirj|  rjdg|trdg|rrtr|rrrr|  rrdg|trdg|rrpr|trji }
+	Sub{ zyrr|rrzy|rrrr| zyrr|  zyrr| rrzy| rrrr| zyrr|  zyrr|rrzy|rrrr|zyzy|  zyrr|rrzy|zyrr|rrrr }
+
+
+	r1r1r1r1
+//	x,1x,1x,1x,1
+
+	Sub{ rrdg|trdg|rrpr| trji|  rrdg| trdg| ijtr| rrpd|  ddkx|trdg|rrpr|rirj|  rjdg|trdg|rrpr|trrr }
+	Sub{ zyrr|rrzy|rrrr| zyrr|  zyrr| rrzy| rrrr| zyrr|  zyrr|rrzy|rrrr|zyrr|  zyrr|rrzy|zyrr|zyzy }
+	r1r1r1r1
+//	x,1x,1x,1x,1
+ }
+#TT.s("p",{n38,,,96})
+#TT.s("t",{n40,,,106})
+#TT.s("d",{n38,,,56})
+#TT.s("g",{n38,,,16})
+#TT.s("i",{n38,32,,56 n38,32,,16})
+#TT.s("j",{n40,32,,56 n40,32,,16}) //rirjrj urauchi
+#TT.s("z",{'n35,,,106n36,,,106'})
+#TT.s("y",{'n35,,,16'})
+#TT.s("k",{n38,32,,56 n40,32,,56})
+#TT.s("x",{n38,48,,56 n40,48,,56 n40,48,,56}) //ddkx kasoku
+#TT.s("q",{n27}) //gaid
+
+Key=0
+
+TR=10 V=100 REV=77 P=64 l16 p%=1666 v106 r%1 [4#TT]
+ 

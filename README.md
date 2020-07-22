@@ -19,17 +19,33 @@
 例えば、Am7 Dm7 G7 CM7と書き込むと、コードストロークを演奏します。<br/>
 <br/>
 <br/>
+拡張機能カッティングでつくった凡例です。<br />
+<br />
+<a rel="mp3" href="./16beat - cutting.mp3">16beat - cutting.mp3</a><br />
+<br />
+拡張機能アルペジオでつくった凡例です。<br />
+<br />
+<a rel="mp3" href="./Moon over the Ruined Castle.mp3">Moon over the Ruined Castle.mp3</a><br />
+<br />
+<br />
+TW-music2(Sakura_mml)+ MsSynth.用、凡例のmmlソースです。<br />
+<br />
+<a rel="mml" href="./cutting.mml">cutting.mml</a><br />
+<br />
+<a rel="mml" href="./moon.mml">moon.mml</a><br />
+<br />
+<br />
 
 <h4>■tuner2.h</h4>
 
 GSリセットを使い、古典調律を行います。<br/>
-例えば、ミーントーン、ヴェルグマイスターなどの調律をサポートします。<br/>
+例えば、ミーントーン、ヴェルクマイスターなどの調律をサポートします。<br/>
 <br/>
 <br/>
 
 <h4>■notecnvt2.h</h4>
 
 mmlを逆順に出力したり、鏡像に出力したりできます。<br/>
-バロック音楽の逆読み演奏や、現代音楽の12音技法を再現します。<br/>
+バロック音楽における譜面の逆読み出力や、現代音楽の12音技法の出力をサポートします。<br/>
 <br/>
 <br/>
