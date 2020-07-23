@@ -20,7 +20,7 @@ Array TimePart=(!%2,0)
    Array RV=(!12,   0,-32, -24 ) // vel | 三連を意識
    Array RR=(!12, -32,  0, -8  ) // gate
  
-TR=1 V=100 P=44 REV=88 l12 v98 o5 @2,8 q104 M.onNoteSine(0,0,6,!2,1) EP.W(116,127,!2) 
+TR=1 V=100 P=44 REV=88 l12 v87 o5 @2,8 q104 M.onNoteSine(0,0,6,!2,1) EP.W(116,127,!2) 
 // REV=88でピアノのおおきさ表現
 	//Melo
 	v__2.onCycle(!4, 0,-1,2,-1 )
