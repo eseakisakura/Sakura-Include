@@ -1,0 +1,212 @@
+/*	push	[ 
+	push	2
+	push	a
+	push	b
+	push	[
+	push	c
+	push	d
+	pop	]	d,c,2,[
+	push	cdcd
+*/
+ 
+// MMLループの展開 
+// スタック版
+
+// [3 abc] 前カウント、
+// [abc]3 後ろカウントの両対応。
+
+// 構造化エディタ対応
+
+Array Block= () // グローバル
+ 
+// ERR 
+	
+Function GT2_ERR(Array RR){ // {""},ZZ,.. 
+
+	Str ZZ;
+
+	Int Size= SizeOf(RR)
+	For(Int i=0; i<Size; i++){
+		If(i%2==0){
+			If(i==0){ ZZ= {"usage | "}+ RR(i) }
+			Else{ ZZ= ZZ+ {" / "}+ RR(i) }
+
+		}Else{ ZZ= ZZ+ {" :"}+ RR(i) }
+	} //
+
+	Print(ZZ);
+} //func
+
+  
+// Loop 
+	 
+Function PUSH(Str TT,""){ 
+
+	Block= (Block,TT)
+
+ } //func
+ 
+Function POP(Array RR){ 
+
+	Array AA= ()
+	Str TT= ""
+
+	Int SS= SizeOf(RR)
+	Int FF= SS- 1
+
+	For(Int i= 0; i< SS; i++){
+
+		If(i< FF){
+			AA= (AA,RR(i))
+		}Else{
+			TT= RR(i)
+		}
+	} //
+
+	Block= AA;
+	Result= TT;
+
+ } //func
+ 
+Function LOOPBREAKER(Str TT,""){ //スタック型 
+
+  Str SS= ""; Str XX= ""
+  Int Chk= 0; Str Num= ""; Int SW= 0
+
+  Int Size= SizeOf(TT)+ 1
+  For(Int i=1; i< Size; i++){
+
+	XX= MID(TT,i,1) // i=1~
+
+	If(SW==2){ // 後ろカウンタピック
+
+		Switch(XX){
+		Case("0"){ Num= Num+ XX
+		}Case("1"){ Num= Num+ XX
+		}Case("2"){ Num= Num+ XX
+		}Case("3"){ Num= Num+ XX
+		}Case("4"){ Num= Num+ XX
+		}Case("5"){ Num= Num+ XX
+		}Case("6"){ Num= Num+ XX
+		}Case("7"){ Num= Num+ XX
+		}Case("8"){ Num= Num+ XX
+		}Case("9"){ Num= Num+ XX
+		}Default{
+			//PUSH("]") 不要
+
+			SS= POPREAD(Num); Num= ""
+Print("chk_sw")
+			PUSH(SS)
+			SW= 0
+		}
+		} //sw
+	}
+	If(SW==1){ // 前カウンタピック
+		Switch(XX){
+		Case("0"){ Num= Num+ XX
+		}Case("1"){ Num= Num+ XX
+		}Case("2"){ Num= Num+ XX
+		}Case("3"){ Num= Num+ XX
+		}Case("4"){ Num= Num+ XX
+		}Case("5"){ Num= Num+ XX
+		}Case("6"){ Num= Num+ XX
+		}Case("7"){ Num= Num+ XX
+		}Case("8"){ Num= Num+ XX
+		}Case("9"){ Num= Num+ XX
+		}Default{
+
+			PUSH(Num); Num= "" // '3['とスタック
+			PUSH("[")
+			SW= 0
+		}
+		} //sw
+	}
+	If(SW==0){
+		Switch(XX){
+		Case("["){ SW= 1; Chk++;
+
+		}Case(":"){
+			If(Chk== 0){ GT2_ERR({"':'ループ外の可能性"}) }
+			PUSH(XX)
+
+		}Case("]"){
+			SW= 2; Chk--;
+			If(Chk< 0){ GT2_ERR({"']'記号が多い可能性"}) }
+
+		}Default{ PUSH(XX)
+		}
+		} //sw
+	}
+Print(Block)
+  } //
+
+  SS= POPREAD("1") // ループ外の追加
+Print("chk_fin")
+
+
+  If(Chk> 0){ GT2_ERR({"'['記号が多い可能性"})
+  }Else{
+	If(SizeOf(Block)== 0){ Result= SS;
+	}Else{ GT2_ERR({"スタックエラー"})
+	}
+  }
+ } //func
+ 
+Function POPREAD(Str UU,""){ 
+
+  Int SW= 0; Int Chk= 0
+  Str NN= ""; Str SS= ""; Str TT= ""
+
+  While(1){
+	If(SizeOf(Block)<= 0){ Exit; } //セーフティ
+
+	TT= POP(Block)
+
+	If(SW== -1){ // 1周期多めためPOP下、スタックからループカウント数
+
+		If(UU!= "" & TT!= ""){
+			GT2_ERR({"ループナンバーが複数ある"})
+		}
+		If(UU== ""){ UU= TT } //前カウンタ入れる
+		If(UU== ""){ UU= "2" }
+
+		Exit;
+	}
+
+	Switch(TT){
+	Case("["){
+		SW= -1
+
+	}Case(":"){
+		NN= SS; SS= "" // SS : NN
+		If(Chk> 0){ GT2_ERR({"':'はループ内で一つのみ"}) }
+		Chk++;
+
+	}Default{
+		SS= TT+ SS
+	}
+	} //sw
+  } //
+
+  Result= MMLADD(UU,SS,NN);
+ } //func
+ 	
+Function MMLADD(Int j, Str XX, Str TT){ 
+
+  Str ZZ= ""
+
+  While(1){
+	ZZ= ZZ+ XX
+
+	j--;
+	If(j<= 0){ Exit; } //break;
+
+	ZZ= ZZ+ TT
+  } //
+
+  Result= ZZ;
+ } //func
+  
+Str CC= LOOPBREAKER("['r2'3u 1^:23^]^^^") 
+Print(CC)
+ 
