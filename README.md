@@ -20,23 +20,6 @@
 例えば、Am7 Dm7 G7 CM7と書き込むと、コードストロークを演奏します。<br/>
 <br/>
 <br/>
-拡張機能カッティングでつくった凡例です。<br />
-<br />
-<a rel="mp3" href="./16beat - cutting.mp3">16beat - cutting.mp3</a><br />
-<br />
-拡張機能アルペジオでつくった凡例です。<br />
-<br />
-<a rel="mp3" href="./Moon over the Ruined Castle.mp3">Moon over the Ruined Castle.mp3</a><br />
-<br />
-<br />
-TW-music2(Sakura_mml)+ MsSynth.用、凡例のmmlソースです。<br />
-<br />
-<a rel="mml" href="./cutting.mml">cutting.mml</a><br />
-<br />
-<a rel="mml" href="./moon.mml">moon.mml</a><br />
-<br />
-<br />
-
 <h4>■tuner2.h</h4>
 
 GSリセットを使い、古典調律を行います。<br/>
