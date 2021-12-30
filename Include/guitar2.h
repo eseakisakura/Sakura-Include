@@ -128,6 +128,8 @@
 		ARPEGGIOのパラメータ調整、CUTTINGでr-への対応をした
 	18	選択コードのLyric出力を追加した
 	20	指定文字以外は、(小括弧の中)に記述するように、変更した
+	27	XGモードのarpタイミング等の修正をした
+
  
 */ 
   
@@ -138,7 +140,7 @@
 
 　　詳細説明書につきましては、
 　　スクリプト下部参照のこと。
-	 
+	
 　□各機能の説明 
 
 
@@ -635,7 +637,7 @@
 */ 
   
 /*　　クイックリファレンス 
-	 
+	
 　□指定できるコードリスト 
 
   [# は、sへ置き換える]
@@ -1389,7 +1391,7 @@ Function STROKE(Str Page,Str Value, Str Chd,Str Len,Array Fret){
 
 	Result= TT;
  } //func
- 	
+ 
 Function STRING_ASSGIN(Str TT,""){ // 弦特性 
 
 	Array RR;
@@ -1397,21 +1399,21 @@ Function STRING_ASSGIN(Str TT,""){ // 弦特性
 	Switch(TT){
 	Case("T9R"){ //arp
 		Switch(#Device_set){
-		Case("XG"){	RR= ( 0,  -3, -3, -2,  -2, -1, -1); }
+		Case("XG"){	RR= ( 0,  -2, -1, -1,  0, 0, 1); }
 		Case("GS"){	RR= ( 0,  -3, -2, -2,  -3, -3, -3); } //t
 		Default{	RR= ( 0,   1,  2,  2,   1,  1,  0); }
 		} //sw
 
 	}Case("Q9R"){
 		Switch(#Device_set){
-		Case("XG"){	RR= ( 0,   0,  8, 24,  32, 40, 56); }
+		Case("XG"){	RR= ( 0,   0,  16, 24,  32, 40, 56); }
 		Case("GS"){	RR= ( 0,   0,  6, 18,  24, 36, 42); } //q
 		Default{	RR= ( 0,   0,  3,  9,  12, 18, 21); }
 		} //sw
 
 	}Case("V9R"){
 		Switch(#Device_set){
-		Case("XG"){	RR= ( 0,   0, -5,-10, -20,-30,-35); }
+		Case("XG"){	RR= ( 0,   0, -5,-10, -15,-25,-35); }
 		Case("GS"){	RR= ( 0,   0, -4,-12, -16,-24,-28); } //v 中域弱く
 		Default{	RR= ( 0,   0, -2, -6,  -8,-12,-14); }
 				//    ^    r   h   u    3   2   1
@@ -1437,9 +1439,9 @@ Function STRING_ASSGIN(Str TT,""){ // 弦特性
 
 	Result= RR
 } //func
-  
+ 	 
 // output_MML 
-	 
+	
 Function FUTOHGOH(Int Num,Str SS,Str LL){ 
 
 	Str TT; Str XX; Int i=0
@@ -1768,7 +1770,7 @@ Function Chdprint(Str Junban,Str Cnv,Str Pos){
    
 //	guitar2.h ------ 
 
-	 
+	
 Function OPEN_TUNING(Str Tune,""){ 
 
 	Array Tuning;
