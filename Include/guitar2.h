@@ -1,8 +1,6 @@
-// title:        "guitar2.h" ver6.2beta 
-// description:  diagramのMML変換付きguitar支援スクリプト (21/ 12/ 20)
+// title:        "guitar2.h" ver6.3beta 
+// description:  diagramMML変換付きguitar支援スクリプト (22/ 1/ 5)
 // keywords:     SAKURA Function     Powered by 04coreworks
-
-
  
 /*  　概要 
 
@@ -15,8 +13,6 @@
 
 
 	guitar2.hは、構造化エディタに対応しています。
-
-	※q__8,q__9,t__9,v__9は使用済みとなります。
 	※ guitar.hとは一部互換性があります。
 
 
@@ -27,17 +23,13 @@
 	※ リネームが必要な場合
 
 	拡張子"h"が、何らかのソフトにより登録されているケースにおいて、
-	"guitar2.h.mml"とリネームされることがあります。
+	"guitar2.h.mml"のようにリネームされることがあります。
 
  	この場合、フォルダオプションの、
 	"登録されている拡張子は表示しない"のチェックを一時的に外し、
 	拡張子を表示するようにした後、リネームしてみて下さい。
-	
+	 
 　□注意点 
-
-
-　　6弦開放のEをo3eとしているため、
-　　トラック始めに、o3記述を入れる必要があります。
 
 
 //　# はs に、置換えて記述して下さい。
@@ -48,17 +40,23 @@
 //　　Abb9#11 -> Abb9s11
 
 
+//　※6弦開放Eをo3eとしているため、
+//　トラック始めに、o3記述を入れる必要があります。
 
-　TimeBase=480 のような細かいチック設定において、
-　ゲート指定がq80 以上の指定があると、
+//　※弦特性を付加するため、q__9,v__9,t__9は使用済みとなります。
 
-　ノートオン、ノートオフのタイミングの関係上、
-　音が途切れる問題があります。
 
-　できるだけ、TimeBase=192 あたりを上限として運用して下さい。
+
+//　TimeBase=192 のような細かいチック設定において、
+//　ゲート指定でq120 以上の指定があると、
+
+//　ノートオン、ノートオフのタイミングの関係上、
+//　音が途切れる問題があります。
+
+//　できるだけ、q120 以下で運用して下さい。
 
  
-　□ 免責事項 /使用条件 /著作権など 
+　□免責事項 /使用条件 /著作権など 
 
 
 　・Apacheライセンス2.0を適用して下さい
@@ -104,13 +102,13 @@
 		Chord Functionをマクロ化
 		Cutting弦調整高音弱から強へ
 		Chdprintのresult抜け修正
-	11	CUTTINGで付点可にした
-     7	14	ARPEGGIOのパラメータ調整
-	28	CUTTINGのパラメータ増加 ->9.13廃止
-     8	1	ARPEGGIOのパラメータ増加
+	11	Cuttingで付点可にした
+     7	14	Arpeggioのパラメータ調整
+	28	Cuttingのパラメータ増加 ->9.13廃止
+     8	1	Arpeggioのパラメータ増加
 	27	Fretnoteの廃止に伴う修正
-     9	13	CUTTINGのtqv__8廃止
-	24	ARPEGGIOのサム指定自動チェンジ追加
+     9	13	Cuttingのtqv__8廃止
+	24	Arpeggioのサム指定自動チェンジ追加
 	25	sus2記述でもadd9可とした、sus4の間違い修正
 
   20 6 19	ver5.0cを廃止、ver4.5系からの派生をver6.0とした
@@ -125,12 +123,19 @@
 
   21 12 8	自動差換えを増やした
 		(A911)->A9sus4、(A1113)->A13sus4、(Am913)->Am69
-		ARPEGGIOのパラメータ調整、CUTTINGでr-への対応をした
+		Arpeggioのパラメータ調整、Cuttingでr-への対応をした
 	18	選択コードのLyric出力を追加した
-	20	指定文字以外は、(小括弧の中)に記述するように、変更した
+	20	外部コマンドは、(小括弧の中)に記述するように、変更した
 	27	XGモードのarpタイミング等の修正をした
 
- 
+  22 1 5	Arpeggioの出力部を刷新した
+		mをmuteとして追加
+		cuttingのduに続く数字をLength,バラつきとした
+		strokeの仕様をLength,バラつきと順番を逆にした
+		Fret_Mmlでマイナス値に対応した
+		upper,dropのopen_tuningを追加した
+
+ 	
 */ 
   
 /*　　取扱説明書 
@@ -140,41 +145,126 @@
 
 　　詳細説明書につきましては、
 　　スクリプト下部参照のこと。
+	 
+　□使用上の制限 
+
+
 	
+　■カッコ内での記述について 
+
+
+//　"" ないし、{}で挟んで対処します。
+
+//　記号、アルファベットが混在するため、
+//　string扱いでなければ、エラーとなるためです。
+
+//　-> Am7("du^u") or Am7({du^u})
+//　-> Am7("r1^3") or Am7({r1^3})
+ 
+　■print機能について 
+
+
+//　"Print"コマンドとの衝突を避けるため、
+//　使用する際は、小文字で"print"と記載のこと。
+
+//　-> Am(3,print)
+ 
+　■音色チェンジでの注意 
+
+
+//　各機能はリアル感のため、4step程度早める処理をしています。
+//　このため、音色チェンジが遅れることがあります。
+
+//　この場合は、あらかじめ音色を変えておく、
+//　ないし戻し休符などを使い、対応して下さい。
+
+//　-> r-8 @25 r8  Em7
+//　-> r-8 @26 r8  FM7
+ 
+　■アルペジオの仕様 
+
+
+//　アルペジオは、弦が2本以下となる場合、
+//　出力しない仕様です。
+
+//　->Fpw2("r1^1",arp,6) // 2弦のみだと、エラー出力
+
+
+//　アルペジオでは、4弦コードであれば、
+//　細い弦から、1,2,3,rと自動でアサインします。このため、
+
+//　4弦コードで、5弦や6弦がない場合、
+
+//　自動的に[r]が、[h],[u]の代りに差換えられる仕様となっています。
+//　(デフォルトモードを#Sum_chg= "off"とすれば、手動指定も可)
+
+//　Am7("rhu 321",arp, 4) | x, x, `a, ``e, ``g, ```c
+
+//　-> rrr321　
+//　-> `a`a`a ``e``g```c
+ 
+　■アルペジオとループカウンタ 
+
+
+//　アルペジオでは、数字で指定するため、
+//　記述によっては、ループカウンタの数字と見分けがつきません。
+
+//　これを避けるため、spaceで明示的に分離する必要があります。
+
+
+//　-> [ 123r]  // [ space 123]
+//　-> [4 123r] // [4 space 123r]
+ 
+　■Chdprintの左寄せ記述について 
+
+
+//　Chdprintでは、左側ふたつに記述がない場合、
+//　左寄せ記述ができます。
+
+//　Chdprint(,,"x02 55x  N") -> Chdprint("x02 55x  N")
+
+
+//　これは#Mode_set="prn"などを併用した際、
+//　","の、記述を減らすための仕様となってます。
+
+//　-> #Mode_set="prn" Chdprint("x02 55x  N")
+  
 　□各機能の説明 
 
 
-	
-　- Stroke ストローク guitar.h互換 - 
+	 
+　- Stroke ストローク  - 
 
 
 //　ストロークプレイを演奏します
 //　コードを一つ指定すると、一回 "ジャン"と鳴ります。
 
+//　guitar.hと互換をとるための機能です。
+
 　-- Strokeの入力例 --
 
-　　A7(3)
+　　A7(4)
 
-　　E7(2,1)
-　　Dm7(3,2,6)
-
-
-　■バラつきを指定 / 3,-2
-
-
-　　F7(3)のように、
-　　3とダウンストロークを指定します。
-　　これにより、ニュアンスを付けることができます
-
-　　F7(-2)であれば、
-　　アップストローク速度が 2となります
+　　E7(1,2)
+　　Dm7(2,3,6)
 
 
 　■音符長の指定 / l2
 
 
-　　G7(3,2)と指定すると、
+　　G7(2)と指定すると、
 　　G7のコードを2分音符分、維持します
+
+
+　■バラつきを指定 / 3,-2
+
+
+　　F7(2,3)のように、
+　　3とダウンストロークを指定します。
+　　これにより、ニュアンスを付けることができます。
+
+　　F7(2,-3)であれば、
+　　アップストローク速度が 3となります
 
 
 　■ルート弦の指定 / 6,5,4
@@ -186,7 +276,7 @@
 　　このポジションを選択するために、
 　　三本あるルート弦から、ひとつを指定します。
 
-　　E7(3,2,6)であれば、
+　　E7(2,3,6)であれば、
 　　6弦ルートの響きを持つコードが選択されます
 
 
@@ -202,27 +292,33 @@
 
 　　A7("d^^u d^d^^ ")
 
-　　E7("du^^ du^^",cut)
-　　Dm7("d^^^ ^^du",cut,5)
+　　E7("du^m du^^",cut)
+　　Dm7("d^^^ ^mdu",cut,5)
 
 
-　■カッティングの指定 / D(own) U(p)
+　■カッティングの指定 / dumr
 
 　　FM7("d^^u  ^ud^",cut)
 
 　　コードをジャカジャンと、鳴らすためには、
-　　ダウン、アップストロークを繰り返します。
+　　 d(own)、u(p)ストロークを繰り返します。
 
 　　このため、奇数番はd、偶数番はu、と打つことで、
 　　空ストロークのある自然な演奏となります。
 
 
-　　FM7("d12^^u  ^ud4^ ",cut)
+　　l2 FM7("d8u8^4^  d4d4^ ",cut)
+
+　　数字を後に付けると、音符長になります。
+
+
+　　l2 FM7("d8u8,7^4^  d4d4,11^ ",cut)
 
 　　ジャラランとバラつきを付けたいのであれば、
-　　"du"の後に数字を加えます。
+　　音符長の後に数字を加えます。
 
 
+　　"m","r"は、ミュートとなります。
 
 
 　■カッティングモードの指定 / cut
@@ -253,19 +349,20 @@
 　　Dm7("r131 3131",arp,5)
 
 
-　■アルペジオの指定 / rhu321
+　■アルペジオの指定 / rhu321m
 
-　　E7("r131 u131",arp)
+　　E7("r13m u131",arp)
 
 　　アルペジオをポロポロ鳴らすには、
-　　r(oot)を指定し、次に123弦のどれかを弾きます。
+　　"r"(oot)を指定し、次に"123"弦のどれかを弾きます。
 
 　　例えば、裏を 1弦で弾くのであれば、基本4つ"r131"をつくり、
 　　これを倍にして、"r131 2131"のように指定します。
 
-　　コードの弦数によりますが、5弦相当の h(armony)、4弦相当の u(nison)も、
+　　コードの弦数によりますが、5弦相当の "h"(armony)、4弦相当の "u"(nison)も、
 　　使用できる場合もあります。
 
+　　"m"は、全弦ミュートとなります。
 
 
 　■アルペジオモードの指定 / arp
@@ -337,16 +434,17 @@
 
 
   
-　□各モードで使用できる文字について 
+　□各モード共通のコマンド文字について 
 
 
 	r	| 休符ですが、アルペシオではルートを意味します
-	^	| タイが使用できます
+	^	| タイ
+	m	| ミュート
 
 	[:]	| ネストのあるループが使用できます
 
 
-	d^du v90 d^^^ のように、v90を挿入する場合、
+	d^du v90 d^^^ のように、外部コマンドv90を挿入する場合、
 	d^du (v90) d^^^ のように小括弧の中へ記述して下さい。
 
 	凡例
@@ -364,12 +462,22 @@
 
 　■アルペジオ Arpeggio
 
+　"r"は、休符ではなくルート指定となります。
+
 　'21'などの和音指定により、ダブルストップもできます。
 
 　l8 A7({ r 3'21'3 u 3'21'3 },arp)
 
 // "l"[音長]は不可です。
-// "r"は、休符ではなくルート指定となります。
+
+
+　外部コマンドは、mml展開の問題で好ましくありません。
+　使う場合は、変更値が内部で完結するように記述する必要があります。
+
+　A7("r321 (v_+11) r321") だと問題があるため、
+　A7("r321 (v_+11) r321(v_-11)") のように記述する。
+
+　(参照 : 詳細説明書 / アルペジオにおけるmml展開、外部コマンドの仕様)
 
 
 　■ダイアグラム呼出し Chdprint
@@ -391,7 +499,7 @@
 
 　//Arp
 　l8 Em7b5(" [r321 ^: 232] 321 ",arp)
-　l8 Em7b5(" r 323 (> v-11 @29,0 Key=7) 'u (t6) 1' (Key(0) <) ",arp)
+　l8 Em7b5(" (q_=0)r 323 (q_+11) 'u (q_-11) 1'",arp)
 
 　//Chdprint
 　Chdprint("x02 55x  N")
@@ -452,9 +560,9 @@
 
 
  
-　□デフォルトモードマクロの変更について 
+　□デフォルトモードの変更について 
 
-//　デフォルトモードマクロを変更することにより、
+//　デフォルトモードを変更することにより、
 //　省略記述がてきます。
 
 
@@ -467,7 +575,7 @@
 　　GMは、旧バージョンのサウンドを再現します。
 
 
-　■#Mode_set= "std" //default
+　■#Mode_set= "stk" //default
 
 　cutやarp記述を省くときに使用します。
 
@@ -476,7 +584,7 @@
 　->#Mode_set="cut"
 　->A7("d^^u")
 
-//　std | prn     | print     | result     | lyric
+//　stk | prn     | print     | result     | lyric
 //　cut | cut_prn | cut_print | cut_result | cut_lyric
 //　arp | arp_prn | arp_print | arp_result | arp_lyric
 
@@ -494,12 +602,12 @@
 　->A7
 
 
-　■#Sum_chg= "on" //default [on | msg | off]
+　■#Sum_chg= "on" //default [on | off]
 
 　通常は、ルート弦を自動アサインしますが、
 
-　自動アサインせず、手動指定をする場合、"off"にします。
-　"msg"にすると変更メッセージが付きます。
+　自動アサインせず、手動で指定をする場合、"off"にします。
+　("off"にするとエラーが出力されます)
 
 
 
@@ -547,97 +655,10 @@
 
 
  
-　□使用上の制限 
-
-
-	
-　■カッコ内での記述について 
-
-
-　　"" ないし、{}で挟んで対処します。
-
-　　記号、アルファベットが混在するため、
-　　string扱いでなければ、エラーとなるためです。
-
-　　Am7(du^u)	->Am7("du^u") or Am7({du^u})
-　　Am7(r1^3)	->Am7("r1^3") or Am7({r1^3})
- 
-　■print機能について 
-
-
-　　"Print"コマンドとの衝突を避けるため、
-　　使用する際は、小文字で"print"と記載のこと。
-
-　　-> Am(3,print)
- 
-　■音色チェンジでの注意 
-
-
-　　各機能はリアル感のため、4step早める処理をしています。
-　　このため、音色チェンジが遅れることがあります。
-
-　　この場合は、あらかじめ音色を変えておく、
-　　ないし戻し休符などを使い、対応して下さい。
-
-　　->r%-4 @25 r%4  Em7
-　　->r%-4 @26 r%4  FM7
- 
-　■アルペジオの仕様 
-
-
-　　アルペジオは、弦が2本以下となる場合、
-　　出力しない仕様です。
-
-　　->Fpw2("r1^1",arp,6) // 2弦のみだと、エラー出力
-
-
-　　アルペジオでは、4弦コードであれば、
-　　細い弦から、1,2,3,rと自動でアサインされます。このため、
-
-　　4弦コードで、[h]や[u]がない場合、
-
-　　自動的に[r]が、[h],[u]の代りに差換えられる仕様となっています。
-
-　　Am7("rhu 321",arp_prn,4)
-
-　　->arp :rhu321 | x, x, `a, ``e, ``g, ```c
-　　->`a`a`a``e``g```c
-
-　　Am7("rhu321",arp_prn,5) //5弦の場合は、[h]は[u]に差換え
-
-　　->arp :rhu321 | x, a, `e, `g, ``c, ``e
-　　->a`e`e`g``c``e
- 
-　■アルペジオとループカウンタ 
-
-
-　　アルペジオでは、数字を使うため、
-　　記述によってはループカウンタの数字と、見分けがつきません。
-
-　　これを避けるため、空白で明示的に分離する必要があります。
-
-
-　　-> [ 123r]  // [空白 123]
-　　-> [4 123r] // [4空白 123r]
- 
-　■Chdprintの左寄せ記述について 
-
-
-　　Chdprintでは、左側ふたつに記述がない場合、
-　　左寄せ記述ができます。
-
-　　Chdprint(,,"x02 55x  N") -> Chdprint("x02 55x  N")
-
-
-　　これは#Mode_set="prn"などを併用した際、
-　　","の、記述を減らすための仕様となってます。
-
-　　-> #Mode_set="prn" Chdprint("x02 55x  N")
-  
 */ 
   
 /*　　クイックリファレンス 
-	
+	 
 　□指定できるコードリスト 
 
   [# は、sへ置き換える]
@@ -674,9 +695,9 @@
 
 　#Device_set= "XG" // [GM(old)| GS | XG(new)]
 
-　#Mode_set= "std" // stdはstrokeのみ
+　#Mode_set= "stk" // stkはstroke
 
-　std | prn     | print     | result     | lyric
+　stk | prn     | print     | result     | lyric
 　cut | cut_prn | cut_print | cut_result | cut_lyric
 　arp | arp_prn | arp_print | arp_result | arp_lyric
 
@@ -718,7 +739,7 @@
 
 
 
-	 
+	
 　■ストローク / guitar.h互換 
 
 　Include(guitar2.h);
@@ -793,9 +814,9 @@
 
 #Device_set= "XG" // [GM(old)| GS | XG(new)]
 
-#Mode_set= "std" // [stroke]
+#Mode_set= "stk" // [stroke]
 
-// std | prn     | print     | result     | lyric
+// stk | prn     | print     | result     | lyric
 // cut | cut_prn | cut_print | cut_result | cut_lyric
 // arp | arp_prn | arp_print | arp_result | arp_lyric
 
@@ -810,7 +831,7 @@
 　#Down_set= "2" // "cut"のダウンバラつき
 　#Up_set  = "2" // "cut"のアップバラつき
 
-  #Sum_chg= "on" // on | msg | off | サム指定自動チェンジ
+  #Sum_chg= "on" // on | off サム指定自動チェンジ
 
 
 　#Tune_set= "nomal" // [regular]チューニング
@@ -853,7 +874,7 @@ Function GT2_ERR(Array RR){ // {""},ZZ,..
 // MML_compile 
 
 	 
-Function LOOPBREAKER(Str TT,""){ //再帰型 
+Function Loop_Breaker(Str TT,""){ //再帰型 
 
   Str XX; Str ZZ;
   Int SW=0; Str Loop=""; Int j;
@@ -904,7 +925,7 @@ Function LOOPBREAKER(Str TT,""){ //再帰型
 
 		}Case("]"){	If(Chk>0){
 					If(Num==0){
-						AB3= LOOPBREAKER(AB3) SW=4; Chk=0
+						AB3= Loop_Breaker(AB3) SW=4; Chk=0
 					}Else{
 						AB3= AB3+ XX; Num-- }
 				}Else{ SW=4
@@ -922,7 +943,7 @@ Function LOOPBREAKER(Str TT,""){ //再帰型
 
 		}Case(":"){	If(Chk>0){
 					If(Num==0){
-						AB2= LOOPBREAKER(AB2) SW=3; Chk=0
+						AB2= Loop_Breaker(AB2) SW=3; Chk=0
 					}Else{
 						AB2= AB2+ XX
 					}
@@ -932,7 +953,7 @@ Function LOOPBREAKER(Str TT,""){ //再帰型
 
 		}Case("]"){	If(Chk>0){
 					If(Num==0){
-						AB2= LOOPBREAKER(AB2) SW=4; Chk=0
+						AB2= Loop_Breaker(AB2) SW=4; Chk=0
 					}Else{
 						AB2= AB2+ XX; Num--
 					}
@@ -969,17 +990,17 @@ Function LOOPBREAKER(Str TT,""){ //再帰型
 
  } //func
 
-// Print( LOOPBREAKER("q[e:[h:y]]t[[w:[k]]:r]u[a[b[:c]]][z]q") )
+// Print( Loop_Breaker("q[e:[h:y]]t[[w:[k]]:r]u[a[b[:c]]][z]q") )
 // q ehyhe t wkkwr wkkw u abcbc abcbc zzq
 
 
  
-Function SPEED_SETTER(Int Spd, Array Fretting){ 
+Function Speed_Setter(Int Spd, Array Fretting){ 
 
 
 	// 弦特性
-	Array V= STRING_ASSGIN("Vel_chk")
-	Array Q= STRING_ASSGIN("Q")
+	Array V= String_Assgin("V")
+	Array Q= String_Assgin("Q")
 
 	Int Num=0; Str XX= ""; Array RR;
 
@@ -1015,36 +1036,36 @@ Function SPEED_SETTER(Int Spd, Array Fretting){
 
 	//While(1){ Num--; PP= (-QQ(Num),PP ); If(Num<=0){ Exit; }  } //Zerominus ->PP: 展開済み数式
 
-	Str TT= " t__9%.N("+ QQ+ ") q__9%.N("+ PP+ ") v__9.N("+ RR+ ") " //全弦ミュート
+	Str TT= "t__9%.N("+ QQ+ ")q__9%.N("+ PP+ ")v__9.N("+ RR+ ")" //全弦ミュート
 
 	Result= TT;
 
 } //func
 
  
-Function CUTTING(Str Page,Str Junban, Str Chd, Array Fret){ 
+Function Cutting(Str Lmm, Str Line, Str Chd, Array Fret){ 
 
-  Junban= Junban+ "$";
+  Lmm= Lmm+ "$";
 
 
-  Int SW=0; Str XX; Str Output;
+  Int SW= 0; Str XX= ""; Str Output= ""
 
-  Str ZZ; Int Count= 0;
+  Str ZZ= ""; Int Count= 0
 
-  Str Cmd; Str Value;
+  Str Cmd= ""; Str Length= ""; Str Value= ""
 
-  Int Size= SizeOf(Junban)+1
+  Int Size= SizeOf(Lmm)+1
   For(Int i=1; i< Size; i++){
 
-	XX= MID(Junban,i,1) // i=1~
+	XX= MID(Lmm,i,1) // i=1~
 
-	If(SW==2){
+	If(SW==3){ // 外部コマンド
 		Switch(Count){
 		Case(0){
 			If(XX==CHR(41)){ // [ ) ]
 
-				Output= Output+ " "+ ZZ+ " "
-				SW= 8
+				Output= Output+ ZZ
+				SW= 5 // [ ) ]
 
 			}Else{
 				If(XX==CHR(40)){ // [ ( ] ネスト対策
@@ -1065,7 +1086,46 @@ Function CUTTING(Str Page,Str Junban, Str Chd, Array Fret){
 		}
 		} //sw
 	}
-	If(SW==6){
+	If(SW==25){ // m^,length
+		Switch(XX){
+		Case(" "){
+		}Case("0"){ Length= Length+ XX
+		}Case("1"){ Length= Length+ XX
+		}Case("2"){ Length= Length+ XX
+		}Case("3"){ Length= Length+ XX
+		}Case("4"){ Length= Length+ XX
+		}Case("5"){ Length= Length+ XX
+		}Case("6"){ Length= Length+ XX
+		}Case("7"){ Length= Length+ XX
+		}Case("8"){ Length= Length+ XX
+		}Case("9"){ Length= Length+ XX
+
+		}Default{
+			Output= Output+ Length
+			SW= 0
+		}
+		} //sw
+	}
+	If(SW==20){ // du,length
+		Switch(XX){
+		Case(" "){
+		}Case("0"){ Length= Length+ XX
+		}Case("1"){ Length= Length+ XX
+		}Case("2"){ Length= Length+ XX
+		}Case("3"){ Length= Length+ XX
+		}Case("4"){ Length= Length+ XX
+		}Case("5"){ Length= Length+ XX
+		}Case("6"){ Length= Length+ XX
+		}Case("7"){ Length= Length+ XX
+		}Case("8"){ Length= Length+ XX
+		}Case("9"){ Length= Length+ XX
+
+		}Case(","){ SW= 8
+		}Default{ SW= 10
+		}
+		} //sw
+	}
+	If(SW==15){ //バラつき
 		Switch(XX){
 		Case(" "){
 		}Case("0"){ Value= Value+ XX
@@ -1079,350 +1139,439 @@ Function CUTTING(Str Page,Str Junban, Str Chd, Array Fret){
 		}Case("8"){ Value= Value+ XX
 		}Case("9"){ Value= Value+ XX
 
-		}Default{ SW=4
+		}Default{ SW= 10
 		}
 		} //sw
 	}
-	If(SW==4){
+	If(SW==10){
 
-		Switch(Page){
+		Switch(Line){
 
-		Case("prn"){	 Output= Output+ Chd; ////Value=""
-		}Case("result"){ Output= Output+ Chd; ////Value=""
+		Case("prn"){	 Output= Output+ Chd
+		}Case("result"){ Output= Output+ Chd
 
 		}Default{
 			If(Cmd=="up"){
 
 				If(Value==""){ Value= #Up_set }
-				Value= "-"+ Value;
+				Value= "-"+ Value
 			}
 			If(Cmd=="down"){
 
 				If(Value==""){ Value= #Down_set }
 			}
 
-			Output= Output+  SPEED_SETTER(Value, Fret)+ Chd; ////Value=""
+			Output= Output+ Speed_Setter(Value, Fret)+ Chd+ Length
 		}
 		} //sw
 
-		SW=0
+		SW= 0
 	}
 	If(SW==0){
 		Switch(XX){
 		Case("$"){ Exit;
-		}Case(CHR(40)){ SW=2; ZZ= "" // [ ( ]
+		}Case(CHR(40)){ SW=3; ZZ= "" // [ ( ]
 
 		}Case(" "){
 		}Case("|"){
 		}Case(";"){
-		}Case("^"){ Output= Output+ XX
-		}Case("."){ Output= Output+ XX
-		}Case("r"){ Output= Output+ XX
+		}Case("."){ Output= Output+ "."
+		}Case("^"){ Output= Output+ "^"; Length= ""; SW= 25
+		}Case("r"){ Output= Output+ "r"; Length= ""; SW= 25
+		}Case("m"){ Output= Output+ "r"; Length= ""; SW= 25
 
-		}Case("u"){ Cmd= "up"; Value=""; SW=6
-		}Case("d"){ Cmd= "down"; Value=""; SW=6
+		}Case("u"){ Cmd= "up"; Length= ""; Value=""; SW= 20
+		}Case("d"){ Cmd= "down"; Length= ""; Value=""; SW= 20
 
 		}Default{ GT2_ERR({"'cut'で定義された文字以外"},XX)
 		}
 		} //sw
 	}
+	If(SW==5){
+		SW= 0 // sw=0 Default ukai
+	}
 	If(SW==8){
-		SW= 0 // Default ukai
+		SW= 15
 	}
   } //
 
   If(SW!=0){
-	GT2_ERR({"CUTTING 実行エラー"},SW)
-
+	GT2_ERR({"Cutting 実行エラー"},SW)
   }Else{
-
-	Switch(Page){
-	Case("prn"){
-	}Case("result"){
-	}Default{
-		Output= Output+ " q__9=0;t__9=0;v__9=0; ";
-	}
-	} //sw
-
-	Result= Output;
+	Result= Output
   }
  } //func
  
-Function STRING_PICK(Array Fret){ 
+Function Fret_Assgin(Array RR){ 
 
-	Array RR;
+	Array SS= ("r","h","u", "3","2","1")
+	Array VV= ()
+	For(Int i= 0; i< 6; i++){
 
-//	SizeOf(Fret)=6
-	For(Int i=0;i<6;i++){
-
-		If(Fret(i)!="x"){ RR=(RR,i+1); } // [^] no bunn
+		If("x" != RR(i)){ VV= (VV,SS(i)) }
 	} //
 
-	Result= RR;
- } // func
-
-
- 
-Function GATEENZAN(Array Gate_number){ // arp no gate 
-
-	Int Base_gate= MML(q)
-
-	Int Size= SizeOf(Gate_number)
-	For(Int i=0; i<Size; i++){
-
-		If(Gate_number(i)!=0){
-
-			Gate_number(i)= Base_gate* (Gate_number(i)-1); // q100 no bunn "-1"
-		}
-	} //
-
-	Result= Gate_number;
+	Result= VV;
  } //func
-
-
  
-Function ARPEGGIO(Str Page, Str Junban, Array Fret){ 
+Function Join_Arr(Array Arr){ 
 
+  Str SS= ""
+  Int Num= SizeOf(Arr)
 
-  Junban= Junban+ "$";
+  For(Int i= 0; i< Num; i++){
 
+	SS= SS+ Arr(i)
+  } //
 
-  Array S_fret= STRING_PICK(Fret)
+  Result= SS;
 
-  Int S_size= SizeOf(S_fret) // 添字の抽出のため
+ } //func
+ 
+Function Arpeggio(Str Lmm, Str Line, Array Fret){ 
 
-  If(S_size<3){ GT2_ERR({"弦数が3本未満"},S_size,{"候補コード"},Chd_gbl) End; }
+  Lmm= Lmm+ "$";
 
+  Int ERR= 0
+  Array Assgin= Fret_Assgin(Fret)
+  Int Assgin_length= SizeOf(Assgin)
 
-  Array Fret_value=(" ", Fret); // [^] no bunn
+  If(Assgin_length< 3){ GT2_ERR({"弦数が3本未満"},Cnt,{"候補コード"},Chd_gbl) End; }
 
-  Array T9value= STRING_ASSGIN("T9R")
-  Array Q9value= STRING_ASSGIN("Q9R")
-  Array V9value= STRING_ASSGIN("V9R")
+  Str TT= ""
+  Array Cmd= ("","","", "","","") //外部コマンド
+  Int Count= 0
 
-  Array W_stuck= ( 0,   0,  0,  0,   0,  0,  0); // waon
-  Array G_stuck= (-1,  -1, -1, -1,  -1, -1, -1); // gate
-  // 弦特性	   ^    r   h   u    3   2   1
+  Array Add= ()
+  Int Togle= 0
 
-  Int NF=0; Int JJ=0; Int DD=0;
-  Int Num; //添字
+  Array RR= ("r","r","r", "r","r","r") // 出だしの休符
+  Array S0= ()
+  Array S1= ()
+  Array S2= ()
+  Array S3= ()
+  Array S4= ()
+  Array S5= ()
 
-  Array T9; Array Q9; Array V9; Str Chk;
+  Int SW= 0
+  Str SS= ""
+  Str Rtn= "" // prn出力
 
-  Str XX; Str ZZ; Str Output;
-  Int Count= 0;
+  Int Length= SizeOf(Lmm)+1
+  For(Int i=1; i< Length; i++){
 
-  Int SW=0;
+	SS= MID(Lmm,i,1) // i=1~
 
-  Array Gate_number;
-
-  Int Size= SizeOf(Junban)+1
-  For(Int i=1; i< Size; i++){
-
-	XX=MID(Junban,i,1) // i=1~
-
-	If(SW==2){
+	If(SW==3){ // 外部コマンド // 差し替えの前
 		Switch(Count){
 		Case(0){
-			If(XX==CHR(41)){ // [ ) ]
+			If(SS==CHR(41)){ // [ ) ]
 
-				Output= Output+ " "+ ZZ+ " "
-				SW= 8
+				Rtn= Rtn+ TT
+				Cmd= (Cmd(0)+ TT,Cmd(1)+ TT,Cmd(2)+ TT, Cmd(3)+ TT,Cmd(4)+ TT,Cmd(5)+ TT)
+				SW= 5 // [ ) ]
 
 			}Else{
-				If(XX==CHR(40)){ // [ ( ] ネスト対策
+				If(SS==CHR(40)){ // [ ( ] ネスト対策
 					Count++;
 				}
-				ZZ= ZZ+ XX
+				TT= TT+ SS
 			}
 
 		}Default{
 
-			If(XX==CHR(41)){ // [ ) ]
+			If(SS==CHR(41)){ // [ ) ]
 				Count--;
 			}
-			If(XX==CHR(40)){ // [ ( ]
+			If(SS==CHR(40)){ // [ ( ]
 				Count++;
 			}
-			ZZ= ZZ+ XX
+			TT= TT+ SS
 		}
 		} //sw
 	}
-	If(SW==4){
-		If(Num==0){
-			Output= Output+ "r" // [^ -> r] ゲート3が"^"倍で6となり伸び過ぎるため
-			Q9=(Q9, 0);
-			V9=(V9, 0);
 
-			If(G_stuck(Num)!=-1){ Gate_number(G_stuck(0))= 0 } //ワンサイクル遅らせる
-			// G_num(2)..G_num(4) <- G_num(3)を後から追加
+	Switch(Assgin_length){ // 差し替え
+	Case(3){
+			Switch(SS){
+			Case("1"){	SS= Assgin(2)
+			}Case("2"){	SS= Assgin(1)
+			}Case("3"){	If(#Sum_chg=="off"){ ERR= 1 }Else{ SS= Assgin(0) }
+			}Case("u"){	If(#Sum_chg=="off"){ ERR= 1 }Else{ SS= Assgin(0) }
+			}Case("h"){	If(#Sum_chg=="off"){ ERR= 1 }Else{ SS= Assgin(0) }
+			}Case("r"){	SS= Assgin(0)
+			}
+			} //sw
+	}Case(4){
+			Switch(SS){
+			Case("1"){	SS= Assgin(3)
+			}Case("2"){	SS= Assgin(2)
+			}Case("3"){	SS= Assgin(1)
+			}Case("u"){	If(#Sum_chg=="off"){ ERR= 1 }Else{ SS= Assgin(0) }
+			}Case("h"){	If(#Sum_chg=="off"){ ERR= 1 }Else{ SS= Assgin(0) }
+			}Case("r"){	SS= Assgin(0)
+			}
+			} //sw
+	}Case(5){
+			Switch(SS){
+			Case("1"){	SS= Assgin(4)
+			}Case("2"){	SS= Assgin(3)
+			}Case("3"){	SS= Assgin(2)
+			}Case("u"){	SS= Assgin(1)
+			}Case("h"){	If(#Sum_chg=="off"){ ERR= 1 }Else{ SS= Assgin(0) }
+			}Case("r"){	SS= Assgin(0)
+			}
+			} //sw
+	}
+	} //sw
 
-		}Else{
-			Output= Output+ Fret_value(Num)
-			T9=(T9, T9value(Num))
-			Q9=(Q9, Q9value(Num))
-			V9=(V9, V9value(Num))
+	If(ERR == 1){ GT2_ERR({"候補コード"},Chd_gbl,{"弦数"},Assgin_length,{"問題の指定"},SS) End; }
 
-			If(G_stuck(Num)!=-1){ Gate_number(G_stuck(Num))= JJ- W_stuck(Num) } //現在値から引く
+	If(SW==15){ // 和音部
+		Switch(SS){
+		Case("'"){		SW= 10
+		}Case("1"){	Add= (Add, 5)
+		}Case("2"){	Add= (Add, 4)
+		}Case("3"){	Add= (Add, 3)
+		}Case("u"){	Add= (Add, 2)
+		}Case("h"){	Add= (Add, 1)
+		}Case("r"){	Add= (Add, 0)
 		}
+		} //sw
+	}
+	If(SW==10){
+		For(Int j= 0; j< 6; j++){
 
-		G_stuck(Num)= DD; DD++; // ゲートカウンタ
-		W_stuck(Num)= JJ; If(NF==0){ JJ++; } // 最後尾の場所
+			For(Int k= 0; k< SizeOf(Add); k++){
 
-		SW=0
+				If(j == Add(k)){	Togle= 1 }
+			} //
+
+			If(Togle == 1){
+				Switch(j){
+				Case(5){	Rtn= Rtn+ Fret(5); S5= (S5, Cmd(5)+ Fret(5)); Cmd(5)= ""; RR(5)= "^"
+				}Case(4){	Rtn= Rtn+ Fret(4); S4= (S4, Cmd(5)+ Fret(4)); Cmd(4)= ""; RR(4)= "^"
+				}Case(3){	Rtn= Rtn+ Fret(3); S3= (S3, Cmd(5)+ Fret(3)); Cmd(3)= ""; RR(3)= "^"
+				}Case(2){	Rtn= Rtn+ Fret(2); S2= (S2, Cmd(5)+ Fret(2)); Cmd(2)= ""; RR(2)= "^"
+				}Case(1){	Rtn= Rtn+ Fret(1); S1= (S1, Cmd(5)+ Fret(1)); Cmd(1)= ""; RR(1)= "^"
+				}Case(0){	Rtn= Rtn+ Fret(0); S0= (S0, Cmd(5)+ Fret(0)); Cmd(0)= ""; RR(0)= "^"
+				}
+				} //sw
+			}Else{
+				Switch(j){
+				Case(5){	S5= (S5, RR(5))
+				}Case(4){	S4= (S4, RR(4))
+				}Case(3){	S3= (S3, RR(3))
+				}Case(2){	S2= (S2, RR(2))
+				}Case(1){	S1= (S1, RR(1))
+				}Case(0){	S0= (S0, RR(0))
+				}
+				} //sw
+			}
+
+			Togle= 0
+		} //
+
+		Rtn= Rtn+ "'"
+		SW= 5 // [ ']
 	}
 	If(SW==0){
-		Switch(XX){
-		Case("$"){ Exit;
-		}Case(CHR(40)){ SW=2; ZZ= "" // [ ( ]
+		Switch(SS){
+		Case("$"){
+
+			S0= (S0, Cmd(0)) // 残処理
+			S1= (S1, Cmd(1))
+			S2= (S2, Cmd(2))
+			S3= (S3, Cmd(3))
+			S4= (S4, Cmd(4))
+			S5= (S5, Cmd(5))
+
+			Exit; //ループブレイク
 
 		}Case(" "){
 		}Case("|"){
 		}Case(";"){
 
-		}Case("'"){ Output= Output+ XX; If(NF==0){ NF=1 }Else{ NF=0; JJ++; }
-		}Case("1"){ SW=4; Num= S_fret(S_size -1)
-		}Case("2"){ SW=4; Num= S_fret(S_size -2)
-		}Case("3"){ SW=6; Num=3
-		}Case("u"){ SW=6; Num=4
-		}Case("h"){ SW=6; Num=5
-		}Case("r"){ SW=4; Num= S_fret(0)
-		}Case("^"){ SW=4; Num= 0 // [q.N(200,0) cr] r ni gate shitei hituyoh
+		}Case(CHR(40)){ SW=3; TT= "" // [ ( ]
 
-		}Default{ GT2_ERR({"'arp'で定義された文字以外"},XX)
+		}Case("m"){ // ALL mute
+
+			Rtn= Rtn+ "r"
+			RR= ("r","r","r", "r","r","r")
+			S0= (S0, RR(0))
+			S1= (S1, RR(1))
+			S2= (S2, RR(2))
+			S3= (S3, RR(3))
+			S4= (S4, RR(4))
+			S5= (S5, RR(5))
+
+		}Case("^"){ // Tai
+
+			Rtn= Rtn+ "^"
+			S0= (S0, RR(0))
+			S1= (S1, RR(1))
+			S2= (S2, RR(2))
+			S3= (S3, RR(3))
+			S4= (S4, RR(4))
+			S5= (S5, RR(5))
+
+		}Case("'"){
+			Rtn= Rtn+ "'"
+			SW= 15
+			Add= ()
+
+		}Case("1"){
+
+			Rtn= Rtn+ Fret(5)
+			S0= (S0, RR(0))
+			S1= (S1, RR(1))
+			S2= (S2, RR(2))
+			S3= (S3, RR(3))
+			S4= (S4, RR(4))
+			S5= (S5, Cmd(5)+ Fret(5)); Cmd(5)= ""; RR(5)= "^"
+
+		}Case("2"){
+
+			Rtn= Rtn+ Fret(4)
+			S0= (S0, RR(0))
+			S1= (S1, RR(1))
+			S2= (S2, RR(2))
+			S3= (S3, RR(3))
+			S4= (S4, Cmd(4)+ Fret(4)); Cmd(4)= ""; RR(4)= "^"
+			S5= (S5, RR(5))
+
+		}Case("3"){
+
+			Rtn= Rtn+ Fret(3)
+			S0= (S0, RR(0))
+			S1= (S1, RR(1))
+			S2= (S2, RR(2))
+			S3= (S3, Cmd(3)+ Fret(3)); Cmd(3)= ""; RR(3)= "^"
+			S4= (S4, RR(4))
+			S5= (S5, RR(5))
+
+		}Case("u"){
+
+			Rtn= Rtn+ Fret(2)
+			S0= (S0, RR(0))
+			S1= (S1, RR(1))
+			S2= (S2, Cmd(2)+ Fret(2)); Cmd(2)= ""; RR(2)= "^"
+			S3= (S3, RR(3))
+			S4= (S4, RR(4))
+			S5= (S5, RR(5))
+
+		}Case("h"){
+
+			Rtn= Rtn+ Fret(1)
+			S0= (S0, RR(0))
+			S1= (S1, Cmd(1)+ Fret(1)); Cmd(1)= ""; RR(1)= "^"
+			S2= (S2, RR(2))
+			S3= (S3, RR(3))
+			S4= (S4, RR(4))
+			S5= (S5, RR(5))
+
+		}Case("r"){
+
+			Rtn= Rtn+ Fret(0)
+			S0= (S0, Cmd(0)+ Fret(0)); Cmd(0)= ""; RR(0)= "^"
+			S1= (S1, RR(1))
+			S2= (S2, RR(2))
+			S3= (S3, RR(3))
+			S4= (S4, RR(4))
+			S5= (S5, RR(5))
+
+
+		}Default{ GT2_ERR({"'arp'で定義された文字以外"},SS)
 		}
 		} //sw
 	}
-	If(SW==8){
-		SW= 0 // Default ukai
-	}
-	If(SW==6){
-		If(S_size< Num+1){
-
-			If(#Sum_chg=="off"){
-
-				GT2_ERR({"候補コード"},Chd_gbl,{"弦は"}+ (Num+1)+ {"つ必要"},S_size,{"問題の指定"},XX) End;
-
-			}Else{
-				While(1){
-					Num--;
-					If(S_size=>Num+1){ Exit; }
-				} //
-
-				Switch(Num){
-				Case(4){  Chk= "u"; Num= S_fret(S_size -4)
-				}Case(3){ Chk= "r"; Num= S_fret(0)
-				}Case(2){ Chk= "2"; Num= S_fret(S_size -2)
-				}
-				} //sw
-
-				If(#Sum_chg=="msg"){
-
-					GT2_ERR({"候補コード"},Chd_gbl,{"弦数"},S_size,{"指定の変更"},XX+ {" -> "}+ Chk)
-				}
-			}
-
-
-		}Else{
-			Num= S_fret(S_size -Num);
-		}
-
-		SW=4;
+	If(SW==5){
+		SW= 0
 	}
   } //
 
-  //Print("Junban:"+Junban)   Print("JJ:"+JJ)
-  //Print("W_stuck:"+W_stuck) Print("G_stuck:"+G_stuck) // debug
+  Str AA= "S{"
+  Str ZZ= "}"
 
+  Array Join= (Join_Arr(S0),Join_Arr(S1),Join_Arr(S2), Join_Arr(S3),Join_Arr(S4),Join_Arr(S5))
 
-  // 後始末
-  For(Int j=0; j<7; j++){ // SizeOf(G_stuck)
+  Array Q9= String_Assgin("Q9")
+  Array V9= String_Assgin("V9")
+  Array T9= String_Assgin("T9")
 
-	If(G_stuck(j)!=-1){
+  Str Output= ""
+  Str XX= ""
+  Int n= 0
 
-		If(j==0){
-			Gate_number(G_stuck(0))= 0
-		}Else{
-			Gate_number(G_stuck(j))= JJ- W_stuck(j)
-		}
-	}
-  } //
-
-  //Print("Gate_number:"+Gate_number) // gate hairetsu
-
-
-  Str SS;
   If(SW!=0){
+	GT2_ERR({"Arpeggio 実行エラー"},SW)
 
-	GT2_ERR({"ARPEGGIO 実行エラー"},SW)
-  } Else{
+  }Else{
 
-	Switch(Page){
+	Switch(Line){
 	Case("prn"){
-		SS= Output;
+		Output= Rtn
 	}Case("result"){
-		SS= Output;
+		Output= Rtn
 	}Default{
-		SS= "q__8.N("+ GATEENZAN(Gate_number)+ ");"
-		SS= SS+ "t__9.N("+ T9+ ");"+ "q__9.N("+ Q9+ ");"+ "v__9.N("+ V9+ ");"
-		SS= SS+ Output+ " q__8=0;t__9=0;q__9=0;v__9=0; "
+		For(Int m= Assgin_length-1; m=> 0; m--){
+
+			Switch(Assgin(m)){
+			Case("1"){ n= 5
+			}Case("2"){ n= 4
+			}Case("3"){ n= 3
+			}Case("u"){ n= 2
+			}Case("h"){ n= 1
+			}Case("r"){ n= 0
+			}
+			} //sw
+
+			 XX= "q__9="+Q9(n)+ "v__9="+V9(n)+ "t__9="+ T9(n)
+
+			If(m > 0){
+				Output= Output+ XX+ AA+ Join(n)+ ZZ
+			}Else{
+				Output= Output+ XX+ Join(n) // Subなし
+			}
+		} //
 	}
 	} //sw
 
-	Result= SS;
+ 	Result= Output
   }
  } //func
  
-Function STROKE(Str Page,Str Value, Str Chd,Str Len,Array Fret){ 
-
-	Str TT;
-	Switch(Page){
-	Case("prn"){
-		TT= Chd;
-	}Case("result"){
-		TT= Chd;
-	}Default{
-
-		If(Len==0){ GT2_ERR({"音長がない/"}+ Chd_gbl, Len) End; }
-
-		TT= SPEED_SETTER(Value,Fret)+ Chd+ Len+ " q__9=0;t__9=0;v__9=0; "
-	}
-	} //sw
-
-	Result= TT;
- } //func
- 
-Function STRING_ASSGIN(Str TT,""){ // 弦特性 
+Function String_Assgin(Str TT,""){ // 弦特性 
 
 	Array RR;
 
 	Switch(TT){
-	Case("T9R"){ //arp
+	Case("T9"){ //arp
 		Switch(#Device_set){
-		Case("XG"){	RR= ( 0,  -2, -1, -1,  0, 0, 1); }
-		Case("GS"){	RR= ( 0,  -3, -2, -2,  -3, -3, -3); } //t
-		Default{	RR= ( 0,   1,  2,  2,   1,  1,  0); }
+		Case("XG"){	RR= (-3, -2, -1,  0, 0, 0); } // 演奏モデル
+		Case("GS"){	RR= (-3, -2, -2,  -3, -3, -3); } //t
+		Default{		RR= (1,  2,  2,   1,  1,  0); }
 		} //sw
 
-	}Case("Q9R"){
+	}Case("Q9"){
 		Switch(#Device_set){
-		Case("XG"){	RR= ( 0,   0,  16, 24,  32, 40, 56); }
-		Case("GS"){	RR= ( 0,   0,  6, 18,  24, 36, 42); } //q
-		Default{	RR= ( 0,   0,  3,  9,  12, 18, 21); }
+		Case("XG"){	RR= (-21,-14,-7,  -5, -3, -1); } // 演奏モデル
+		Case("GS"){	RR= (0, 6, 18,  24, 36, 42); } //q
+		Default{		RR= (0,  3,  9,  12, 18, 21); }
 		} //sw
 
-	}Case("V9R"){
+	}Case("V9"){
 		Switch(#Device_set){
-		Case("XG"){	RR= ( 0,   0, -5,-10, -15,-25,-35); }
-		Case("GS"){	RR= ( 0,   0, -4,-12, -16,-24,-28); } //v 中域弱く
-		Default{	RR= ( 0,   0, -2, -6,  -8,-12,-14); }
-				//    ^    r   h   u    3   2   1
+		Case("XG"){	RR= (0, -4,-8, -12,-20,-28); } // 構造モデル
+		Case("GS"){	RR= (0, -4,-12, -16,-24,-28); } //v 中域弱く
+		Default{		RR= (0, -2, -6,  -8,-12,-14); }
+						//r   h   u    3   2   1
 		} //sw
 
-	}Case("Vel_chk"){ //cut
+	}Case("V"){ //cut
 
 		Switch(#Device_set){
-		Case("XG"){	RR= (0,-2,-4,  -5, -6, -7); }
+		Case("XG"){	RR= (0,-1,-3,  -4, -6, -7); }
 		Case("GS"){	RR= (0,-2,-4,  -6, -8,-10); } //v
 		Default{	RR= (0,-6,-9, -10,-13,-19); }
 		} //sw
@@ -1439,143 +1588,155 @@ Function STRING_ASSGIN(Str TT,""){ // 弦特性
 
 	Result= RR
 } //func
- 	 
+  
 // output_MML 
-	
-Function FUTOHGOH(Int Num,Str SS,Str LL){ 
+	 
+Function Futohgoh(Int Num,Str SS,Str LL){ 
 
-	Str TT; Str XX; Int i=0
+	Str TT= ""; Str XX= ""; Int i= 0
 
-	If(Num<0){ XX=SS; i= -Num }
-	If(Num>0){ XX=LL; i= Num }
+	If(Num<0){ XX= SS; i= -Num }
+	If(Num>0){ XX= LL; i= Num }
 
 	While(1){
-		If(i<=0){ Exit; }
+		If(i <=0){ Exit; }
 		TT= TT+ XX
 		i--
 	} //
-	Result= TT;
+	Result= TT
 } //func
-
  
-Function FRETMML(Str Selector, Int Barre, Array Fret){ // ab版 
+Function Fret_Mml(Str Selector, Int Barre, Array Fret){ // ab版 
 
-  Array Tuning= OPEN_TUNING(#Tune_set) // o3=n36+  4,9,12+2, 12+7,12+11,24+4
+  Array Tuning= Open_Tuning(#Tune_set) // o3=n36+  4,9,12+2, 12+7,12+11,24+4
 
-  Str TT; Int NN; Str Layer; Array RR;
+    Str TT= ""; Int Num= 0; Int NN= 0; Int DD= 0
+  Str Layer= ""; Array RR= ()
 
-  Array NoteChk =("c","d-","d","e-", "e","f","f+","g", "g+","a","b-","b");
+  Array Note_arr =("c","d-","d","e-", "e","f","f+","g", "g+","a","b-","b")
 
-  Int Chk=0;
-
+  Int Count= 0
   For(Int i=0; i< 6; i++){
 
-	TT=Fret(i) //for if[0,"x"] kubetsu int 0 str x
+	TT= Fret(i) //for if[0,"x"] kubetsu int 0 str x
+
+	Num= Barre+ Fret(i)+ Tuning(i)
+
+	NN= Num/12
+	If(Num < 0){ NN= NN- 1 } // [-3/12= 0]
+
+	DD= Num%12
+	If(DD < 0){ DD= DD+ 12 } //[-3%12= -3]
+
 	If(Selector=="gousei"){
 
-		If(TT!="x"){
-			NN= Barre+ Fret(i)+ Tuning(i);
-			If(NN/12!=Chk){ Layer= Layer+ FUTOHGOH(NN/12-Chk,"<",">"); Chk= NN/12 };
-			Layer= Layer+ NoteChk(NN%12);
+		If(TT !="x"){
+
+			If(NN != Count){ //<> no add
+				Layer= Layer+ Futohgoh(NN- Count, "<",">")
+				Count= NN
+			}
+			Layer= Layer+ Note_arr(DD)
 		}
 
 	}Else{ // "hairetsu"
 
-		If(TT!="x"){
-			NN= Barre+ Fret(i)+ Tuning(i);
-			Layer= Layer+ FUTOHGOH(NN/12,CHR(34),"`")+ NoteChk(NN%12);
-			RR= (RR, Layer); Layer=""
+		If(TT !="x"){
 
+			Layer= Layer+ Futohgoh(NN, CHR(34), "`")
+			Layer= Layer+ Note_arr(DD)
+
+			RR= (RR, Layer); Layer=""
 		}Else{
-			RR= (RR, TT);
+
+			RR= (RR, TT) // "x"
 		}
 	}
   } //
 
-  If(Selector=="gousei"){ Result= "'"+ Layer+ FUTOHGOH(0-Chk,"<",">")+ "'"; }Else{ Result= RR; }
+  If(Selector=="gousei"){
 
+	Result= "'"+ Layer+ Futohgoh(0-Count, "<", ">")+ "'"
+  }Else{
+
+	Result= RR
+  }
  } //func
  
-Function MML_OUT(Str Cnv,Str Junban,Str Barre,Array Fret){ 
+Function Mml_Out(Str Lmm, Str Patch, Str Barre, Array Fret){ 
 
-	If(Cnv==""){ Cnv= #Mode_set }
+	//小文字化
+	Switch(Patch){
+	Case(""){			Patch= #Mode_set // stk etc.
+	}Case("Cut"){		Patch= "cut"
+	}Case("Arp"){		Patch= "arp"
 
-	//モード小文字化
-	Switch(Cnv){
-	Case("Cut"){		Cnv= "cut"
-	}Case("Arp"){		Cnv= "arp"
+	}Case("Prn"){		Patch= "prn"
+	}Case("Cut_prn"){	Patch= "cut_prn"
+	}Case("Cut_Prn"){	Patch= "cut_prn"
+	}Case("Arp_prn"){	Patch= "arp_prn"
+	}Case("Arp_Prn"){	Patch= "arp_prn"
 
-	}Case("Prn"){		Cnv= "prn"
-	}Case("Cut_prn"){	Cnv= "cut_prn"
-	}Case("Cut_Prn"){	Cnv= "cut_prn"
-	}Case("Arp_prn"){	Cnv= "arp_prn"
-	}Case("Arp_Prn"){	Cnv= "arp_prn"
+	}Case("Print"){		Patch= "print"
+	}Case("Cut_print"){	Patch= "cut_print"
+	}Case("Cut_Print"){	Patch= "cut_print"
+	}Case("Arp_print"){	Patch= "arp_print"
+	}Case("Arp_Print"){	Patch= "arp_print"
 
-	}Case("Print"){		Cnv= "print"
-	}Case("Cut_print"){	Cnv= "cut_print"
-	}Case("Cut_Print"){	Cnv= "cut_print"
-	}Case("Arp_print"){	Cnv= "arp_print"
-	}Case("Arp_Print"){	Cnv= "arp_print"
+	}Case("Result"){	Patch= "result"
+	}Case("Cut_result"){	Patch= "cut_result"
+	}Case("Cut_Result"){	Patch= "cut_result"
+	}Case("Arp_result"){	Patch= "arp_result"
+	}Case("Arp_Result"){	Patch= "arp_result"
 
-	}Case("Result"){	Cnv= "result"
-	}Case("Cut_result"){	Cnv= "cut_result"
-	}Case("Cut_Result"){	Cnv= "cut_result"
-	}Case("Arp_result"){	Cnv= "arp_result"
-	}Case("Arp_Result"){	Cnv= "arp_result"
-
-	}Case("Lyric"){		Cnv= "lyric"
-	}Case("Cut_lyric"){	Cnv= "cut_lyric"
-	}Case("Cut_Lyric"){	Cnv= "cut_lylic"
-	}Case("Arp_lyric"){	Cnv= "arp_lyric"
-	}Case("Arp_Lyric"){	Cnv= "arp_lyric"
+	}Case("Lyric"){		Patch= "lyric"
+	}Case("Cut_lyric"){	Patch= "cut_lyric"
+	}Case("Cut_Lyric"){	Patch= "cut_lylic"
+	}Case("Arp_lyric"){	Patch= "arp_lyric"
+	}Case("Arp_Lyric"){	Patch= "arp_lyric"
 	}
 	} //sw
 
 
-	Str Page; Str Len; Int NN;
+	Str Line; Str Len; Int NN;
 
-	Switch(Cnv){
-	Case("std"){		NN= MML(l%) Len= "%"+ NN
-					Cnv= "std"; Page= "run" // ""
+	Switch(Patch){
+	Case("cut"){		Patch= "cut"; Line= "run"
+	}Case("cut_prn"){	Patch= "cut"; Line= "prn"
+	}Case("cut_print"){	Patch= "cut"; Line= "print"
+	}Case("cut_result"){	Patch= "cut"; Line= "result"
+	}Case("cut_lyric"){	Patch= "cut"; Line= "lyric"
 
-	}Case("prn"){		Cnv= "std"; Page= "prn"
-	}Case("print"){		Cnv= "std"; Page= "print"
-	}Case("result"){		Cnv= "std"; Page= "result"
-	}Case("lyric"){		Cnv= "std"; Page= "lyric"
+	}Case("arp"){		Patch= "arp"; Line= "run"
+	}Case("arp_prn"){	Patch= "arp"; Line= "prn"
+	}Case("arp_print"){	Patch= "arp"; Line= "print"
+	}Case("arp_result"){	Patch= "arp"; Line= "result"
+	}Case("arp_lyric"){	Patch= "arp"; Line= "lyric"
 
-	}Case("cut"){		Cnv= "cut"; Page= "run"
-	}Case("cut_prn"){	Cnv= "cut"; Page= "prn"
-	}Case("cut_print"){	Cnv= "cut"; Page= "print"
-	}Case("cut_result"){	Cnv= "cut"; Page= "result"
-	}Case("cut_lyric"){	Cnv= "cut"; Page= "lyric"
+	}Case("prn"){		Patch= "stk"; Line= "prn"
+	}Case("print"){		Patch= "stk"; Line= "print"
+	}Case("result"){		Patch= "stk"; Line= "result"
+	}Case("lyric"){		Patch= "stk"; Line= "lyric"
 
-	}Case("arp"){		Cnv= "arp"; Page= "run"
-	}Case("arp_prn"){	Cnv= "arp"; Page= "prn"
-	}Case("arp_print"){	Cnv= "arp"; Page= "print"
-	}Case("arp_result"){	Cnv= "arp"; Page= "result"
-	}Case("arp_lyric"){	Cnv= "arp"; Page= "lyric"
-
-	}Default{      		Len= Cnv
-					Cnv= "std"; Page= "run" // ^0-9
-	// モード不明時ここ通過、あえてエラー
+	}Default{			Line= "run" // [0-9] バラつき or stk etc.
 	}
 	} //sw
 
 
 	Str ZZ; Str TT; Str SS; Array RR;
 
-	Switch(Cnv){
+	Switch(Patch){
 	Case("cut"){
 
-		If(Junban==""){ Junban= #Cut_set; }
-		Junban= LOOPBREAKER(Junban)
+		If(Lmm==""){ Lmm= #Cut_set; }
+		Lmm= Loop_Breaker(Lmm)
 
-		ZZ= FRETMML("gousei",Barre,Fret)
-		TT= CUTTING(Page, Junban, ZZ, Fret)
+		ZZ= Fret_Mml("gousei",Barre,Fret)
+		TT= Cutting(Lmm, Line, ZZ, Fret)
 
-		Switch(Page){
+		Switch(Line){
 		Case("prn"){
-			Print("cut :"+ Junban +" | "+ ZZ); Print(TT)
+			Print("cut :"+ Lmm +" | "+ ZZ); Print(TT)
 		}Case("result"){
 			Res_gbl= TT; //result出力
 		}Case("print"){
@@ -1589,15 +1750,15 @@ Function MML_OUT(Str Cnv,Str Junban,Str Barre,Array Fret){
 
 	}Case("arp"){
 
-		If(Junban==""){ Junban= #Arp_set; }
-		Junban= LOOPBREAKER(Junban)
+		If(Lmm==""){ Lmm= #Arp_set; }
+		Lmm= Loop_Breaker(Lmm)
 
-		RR= FRETMML("hairetsu",Barre,Fret)
-		TT= ARPEGGIO(Page, Junban, RR)
+		RR= Fret_Mml("hairetsu",Barre,Fret)
+		TT= Arpeggio(Lmm, Line, RR)
 
-		Switch(Page){
+		Switch(Line){
 		Case("prn"){
-			Print("arp :"+ Junban +" | "+ RR); Print(TT)
+			Print("arp :"+ Lmm +" | "+ RR); Print(TT)
 		}Case("result"){
 			Res_gbl= TT; //result出力
 		}Case("print"){
@@ -1611,39 +1772,55 @@ Function MML_OUT(Str Cnv,Str Junban,Str Barre,Array Fret){
 
 	}Default{
 
-		ZZ= FRETMML("gousei",Barre,Fret)
+		ZZ= Fret_Mml("gousei",Barre,Fret)
 
-		TT= STROKE(Page,Junban,ZZ,Len,Fret)
-
-		Switch(Page){
+		Switch(Line){
 		Case("prn"){
+
 			For(Int i=0;i<6;i++){ SS= SS+ Fret(i); } //
 
-			Print(""+ Chd_gbl+ " root:"+ Root_gbl+ "  / "+ Barre+ "fret "+ SS)
-			Print(TT)
+			Print("root:"+ Root_gbl+ " "+ Chd_gbl+ " / "+ Barre+ "fret "+ SS)
+			Print(ZZ)
+
 		}Case("result"){
-			Res_gbl= TT; //result出力
-		}Case("lyric"){
-			Lyric= Chd_gbl; TT;
-		}Case("run"){
-			TT;
-		}Case("print"){
-			Print(TT)
+
+			Res_gbl= ZZ; //result出力
+
+		}Default{
+
+			If(Lmm == ""){
+
+				NN= MML(l%); Lmm= "%"+ NN
+			}Else{
+
+				NN= Lmm // int check
+
+				If(NN==0){ GT2_ERR({"音長がない/"}+ Chd_gbl, Lmm) End; }
+			}
+
+			TT= Speed_Setter(Patch, Fret)+ ZZ+ Lmm // + " q__9=0;t__9=0;v__9=0; "
+			// patch [0-9] バラつき
+
+			Switch(Line){
+			Case("lyric"){	Lyric= Chd_gbl; TT;
+			}Case("run"){	TT;
+			}Case("print"){	Print(TT)
+			}
+			} //sw
 		}
 		} //sw
 	}
 	} //sw
  } //func
  
-Function Chdprint(Str Junban,Str Cnv,Str Pos){ 
+Function Chdprint(Str Lmm, Str Patch, Str Pos){ 
 
 
-  If(Cnv=="" &Pos==""){ Pos= Junban; Junban= "" } // Posへ移動
+  If(Patch=="" &Pos==""){ Pos= Lmm; Lmm= "" } // Posへ移動
 
   Int Barre; Array Keynote; Int Rootkey; Array Fret; Int Num;
 
   Str TT; Str XX; Str ZZ= ""
-  Int Fret_Chk= 0; Int NN;
 
   Int Root_gen; Int Gen_Chk=0; Int j=0; //gen number
 
@@ -1657,32 +1834,32 @@ Function Chdprint(Str Junban,Str Cnv,Str Pos){
 
 		Switch(XX){
 		Case(" "){
-		}Case("r"){ Root_gen= 6-j; ZZ= ZZ+"0"; j++;
-		}Case("s"){ Root_gen= 6-j; ZZ= ZZ+"x"; j++;
-		}Case("x"){ j++; ZZ= ZZ+XX
+		}Case("r"){ Root_gen= 6-j; ZZ= ZZ+"0"; j++
+		}Case("s"){ Root_gen= 6-j; ZZ= ZZ+"x"; j++
+		}Case("x"){ ZZ= ZZ+XX; j++
 		}Case("+"){ ZZ= XX
 		}Case("-"){ ZZ= XX
-		}Case("0"){ j++; ZZ= ZZ+ XX
-		}Case("1"){ j++; ZZ= ZZ+ XX
-		}Case("2"){ j++; ZZ= ZZ+ XX
-		}Case("3"){ j++; ZZ= ZZ+ XX
-		}Case("4"){ j++; ZZ= ZZ+ XX
-		}Case("5"){ j++; ZZ= ZZ+ XX
-		}Case("6"){ j++; ZZ= ZZ+ XX
-		}Case("7"){ j++; ZZ= ZZ+ XX
-		}Case("8"){ j++; ZZ= ZZ+ XX
-		}Case("9"){ j++; ZZ= ZZ+ XX
-		}Case("a"){ j++; ZZ= ZZ+"10"
-		}Case("b"){ j++; ZZ= ZZ+"11"
-		}Case("c"){ j++; ZZ= ZZ+"12"
+		}Case("0"){ ZZ= ZZ+ XX; j++
+		}Case("1"){ ZZ= ZZ+ XX; j++
+		}Case("2"){ ZZ= ZZ+ XX; j++
+		}Case("3"){ ZZ= ZZ+ XX; j++
+		}Case("4"){ ZZ= ZZ+ XX; j++
+		}Case("5"){ ZZ= ZZ+ XX; j++
+		}Case("6"){ ZZ= ZZ+ XX; j++
+		}Case("7"){ ZZ= ZZ+ XX; j++
+		}Case("8"){ ZZ= ZZ+ XX; j++
+		}Case("9"){ ZZ= ZZ+ XX; j++
+		}Case("a"){ ZZ= ZZ+"10"; j++
+		}Case("b"){ ZZ= ZZ+"11"; j++
+		}Case("c"){ ZZ= ZZ+"12"; j++
 		}Default{ GT2_ERR({"フレット指定文字以外です"},XX)
 		}
 		} //sw
 
 		If(j!=Gen_Chk){
-			NN= ZZ;  If(NN<Fret_Chk){ Fret_Chk= NN; }
 
-			Fret=(Fret,ZZ); ZZ=""; Gen_Chk= j;
+			Gen_Chk= j
+			Fret=(Fret,ZZ); ZZ=""
 		}
 
 	}Else{
@@ -1708,8 +1885,8 @@ Function Chdprint(Str Junban,Str Cnv,Str Pos){
 
   If(SizeOf(Fret)!=6){ GT2_ERR({"弦が6つ必要"},SizeOf(Fret) ) End; }
 
-	Switch(ZZ){
-	Case("N"){  Barre=0
+  Switch(ZZ){
+	Case("N"){ Barre= 0
 	}Case("A"){  Rootkey=9
 	}Case("A#"){ Rootkey=10
 	}Case("As"){ Rootkey=10
@@ -1736,13 +1913,13 @@ Function Chdprint(Str Junban,Str Cnv,Str Pos){
 	}Case("Ab"){ Rootkey=8
 	}Default{ GT2_ERR({"[A,N]存在しないキー指定、もしくナット文字がない"},ZZ)
 	}
-	} //sw
+  } //sw
 
 
   If(ZZ!="N"){
 
 	Switch(Root_gen){
-	Case(3){ Keynote=(5,6,7,8,9, 10,11,0,1,2,3,4)	// 3G
+	Case(3){ Keynote=(5,6,7,8,9, 10,11,0,1,2,3,4)		// 3G
 	}Case(4){ Keynote=(10,11,0,1,2, 3,4,5,6,7,8,9)	// 4D
 	}Case(5){ Keynote=(3,4,5,6,7, 8,9,10,11,0,1,2)	// 5A
 	}Case(6){ Keynote=(8,9,10,11,0, 1,2,3,4,5,6,7)	// 6E
@@ -1751,16 +1928,15 @@ Function Chdprint(Str Junban,Str Cnv,Str Pos){
 	} //sw
 
 	Barre= Keynote(Rootkey)
-
-	If(Fret_Chk+Barre<0){ Barre= Barre+12 }
+	Barre= Barre_Chk(Barre, Fret)
   }
 
   Array GG= ("Nut","1E","2B","3G","4E","5A","6E")
 
-  Chd_gbl = Pos;		// Global
+  Chd_gbl = Pos;			// Global
   Root_gbl= GG(Root_gen);	// Global
 
-  MML_OUT(Cnv,Junban,Barre,Fret)
+  Mml_Out(Lmm, Patch, Barre, Fret)
 
   Result= Res_gbl;	// Global
 
@@ -1770,44 +1946,49 @@ Function Chdprint(Str Junban,Str Cnv,Str Pos){
    
 //	guitar2.h ------ 
 
-	
-Function OPEN_TUNING(Str Tune,""){ 
+	 
+Function Open_Tuning(Str Tune,""){ 
 
 	Array Tuning;
 
 	Switch(Tune){
-	Case("dadgad"){    Tune= "DADGAD"
-	}Case("Nashville"){ Tune= "nashville"
-	}Case("Nash"){      Tune= "nashville"
-	}Case("nash"){      Tune= "nashville"
-	}Case("DropD"){     Tune= "dropD"
-	}Case("OpenDm"){    Tune= "openDm"
-	}Case("OpenD"){     Tune= "openD"
-	}Case("OpenGm"){    Tune= "openGm"
-	}Case("OpenG"){     Tune= "openG"
-	}Case("Nomal"){     Tune= "nomal"
+	Case("dadgad"){	Tune= "DADGAD"
+	}Case("Nashville"){	Tune= "nashville"
+	}Case("Nash"){		Tune= "nashville"
+	}Case("nash"){		Tune= "nashville"
+	}Case("DropD"){	Tune= "dropD"
+	}Case("OpenDm"){	Tune= "openDm"
+	}Case("OpenD"){	Tune= "openD"
+	}Case("OpenGm"){	Tune= "openGm"
+	}Case("OpenG"){	Tune= "openG"
+	}Case("Nomal"){	Tune= "nomal"
 	}
 	} //sw
 
 	Switch(Tune){
-	Case("DADGAD"){	    Tuning=( 2, 9,14,19,21,26) // DAD GAD
-	}Case("nashville"){ Tuning=(16,21,26,31,23,28) // >EAD G<BE
-	}Case("dropD"){     Tuning=( 2, 9,14,19,23,28) // DAD GBE
-	}Case("openDm"){    Tuning=( 2, 9,14,17,21,26) // DAD FAD
-	}Case("openD"){     Tuning=( 2, 9,14,18,21,26) // DAD F#AD
-	}Case("openGm"){    Tuning=( 2, 7,14,19,22,26) // DGD GBbD
-	}Case("openG"){     Tuning=( 2, 7,14,19,23,26) // DGD GBD
-	}Case("nomal"){     Tuning=( 4, 9,14,19,23,28) // EA>D GB>E
+	Case("upper642"){ Tuning=(4+12, 9, 14+12, 19, 23+12, 28) // `EA>`D G`B>E
+	}Case("upper531"){ Tuning=(4, 9+12, 14, 19+12, 23, 28+12) // E`A>D `GB>`E
+	}Case("drop642"){ Tuning=(4-12, 9, 14-12, 19, 23-12, 28) // "EA>"D G"B>E
+	}Case("drop531"){ Tuning=(4, 9-12, 14, 19-12, 23, 28-12) // E"A>D "GB>"E
+
+	}Case("DADGAD"){	Tuning=( 2, 9,14,19,21,26) // DAD GAD
+	}Case("nashville"){	Tuning=(16,21,26,31,23,28) // >EAD G<BE
+	}Case("dropD"){	Tuning=( 2, 9,14,19,23,28) // DAD GBE
+	}Case("openDm"){	Tuning=( 2, 9,14,17,21,26) // DAD FAD
+	}Case("openD"){	Tuning=( 2, 9,14,18,21,26) // DAD F#AD
+	}Case("openGm"){	Tuning=( 2, 7,14,19,22,26) // DGD GBbD
+	}Case("openG"){	Tuning=( 2, 7,14,19,23,26) // DGD GBD
+	}Case("nomal"){		Tuning=( 4, 9,14,19,23,28) // EA>D GB>E
 	}Default{ GT2_ERR({"チューニングリストにない Tune"},Tune) End;
 	}
 	} //sw
 
-	If(SizeOf(Tuning)!=6){ GT2_ERR({"Open_tuning; [6]調弦数が不足"},SizeOf(Tuning)) End; }
+	If(SizeOf(Tuning) != 6){ GT2_ERR({"Open_Tuning; [6]調弦数が不足"},SizeOf(Tuning)) End; }
 
 	Result= Tuning;
  } //func
  
-Function ROOTHOSEI(Int NN, Int DD, Array Fret){ // hairetsu "x" sashikae 
+Function Hosei_Root(Int NN, Int DD, Array Fret){ // hairetsu "x" sashikae 
 
 	DD=6-DD-1;  //SizeOf(Fret)
 
@@ -1827,7 +2008,7 @@ Function ROOTHOSEI(Int NN, Int DD, Array Fret){ // hairetsu "x" sashikae
 } //func
 
  
-Function BARRE_CHK(Array FF){ 
+Function Barre_Chk(Int BB, Array FF){ 
 
 	Int j= 0;
 	For(Int i=0; i< 6; i++){
@@ -1838,13 +2019,15 @@ Function BARRE_CHK(Array FF){
 		}
 	} //
 
-	Result= j;
+	If(BB< j){ BB= BB+ 12 }
+
+	Result= BB;
  } //func
  
-Function PI_CHDLIST(Int Rootkey,Str Chdname,Str Junban,Str Cnv,Str Vce){ 
+Function Pi_Chdlist(Int Rootkey, Str Chdname, Str Lmm, Str Patch, Str Pos){ 
 
 
-	Int Barre= 0; Int Num= 0;
+	Int Barre= 0;
 	Str Number= 0; Array Root_hosei= (0,0);
 	Array Fret; Array Keynote; Array Arr; Array Brr;
 
@@ -1860,7 +2043,7 @@ Function PI_CHDLIST(Int Rootkey,Str Chdname,Str Junban,Str Cnv,Str Vce){
 					Fret=(0,3,2, 0,1,0);
 */
 
-  If(Vce==""){ //指定がない場合
+  If(Pos==""){ //指定がない場合
 
 	Switch(Chdname){
 
@@ -1948,21 +2131,21 @@ Function PI_CHDLIST(Int Rootkey,Str Chdname,Str Junban,Str Cnv,Str Vce){
 	}
 	} //sw
 
-	Vce= Arr(Rootkey)
+	Pos= Arr(Rootkey)
   }
 
 
-	Switch(Vce){
+	Switch(Pos){
 	// オープンpos.指定
-	Case("a5A"){ Number= Vce
-	}Case("b5A"){ Number= Vce
-	}Case("c5A"){ Number= Vce
-	}Case("d4D"){ Number= Vce
-	}Case("e6E"){ Number= Vce
-	}Case("f4D"){ Number= Vce
-	}Case("f6E"){ Number= Vce
-	}Case("g-6E"){ Number= Vce
-	}Case("g6E"){ Number= Vce
+	Case("a5A"){ Number= Pos
+	}Case("b5A"){ Number= Pos
+	}Case("c5A"){ Number= Pos
+	}Case("d4D"){ Number= Pos
+	}Case("e6E"){ Number= Pos
+	}Case("f4D"){ Number= Pos
+	}Case("f6E"){ Number= Pos
+	}Case("g-6E"){ Number= Pos
+	}Case("g6E"){ Number= Pos
 
 	// クローズドpos.指定
 	}Case("4#"){  Number= "4D"; Root_hosei= (1,0)
@@ -1986,7 +2169,7 @@ Function PI_CHDLIST(Int Rootkey,Str Chdname,Str Junban,Str Cnv,Str Vce){
 	}Case("6x"){  Number= "6E"; Root_hosei= (0,1)
 	}Case("6bx"){ Number= "6E"; Root_hosei= (1,1)
 	}Default{
-		GT2_ERR({""}+ Vce+ {"ポジション指定にない Chdname"},Chdname)
+		GT2_ERR({""}+ Pos+ {"ポジション指定にない Chdname"},Chdname)
 	}
 	} //sw
 
@@ -2476,27 +2659,25 @@ Function PI_CHDLIST(Int Rootkey,Str Chdname,Str Junban,Str Cnv,Str Vce){
 
 	Root_gbl= Number // Global
 
+	Barre= Barre_Chk(Barre, Fret)
 
-	Num= BARRE_CHK(Fret)
 
-	If(Barre< Num){ Barre= Barre+ 12 }
-
-	Fret= ROOTHOSEI(Root_hosei(0),Root_hosei(1),Fret)
+	Fret= Hosei_Root(Root_hosei(0),Root_hosei(1),Fret)
 
 	If(SizeOf(Fret)!=6){
 
-		GT2_ERR({"PI_CHDLIST: 弦が6つ必要"},SizeOf(Fret) )
+		GT2_ERR({"Pi_Chdlist: 弦が6つ必要"},SizeOf(Fret) )
 		End;
 	}
 
-	MML_OUT(Cnv,Junban,Barre,Fret)
+	Mml_Out(Lmm, Patch, Barre, Fret)
 
  } //func
 
   
 // Chord Functionマクロ 
 
-#Gt2_Chd= { Function #?1#?3(Str Spd,Str Lgh,Str Vce){ Chd_gbl="#?1#?3"; PI_CHDLIST("#?2","#?4", Spd,Lgh,Vce); Result=Res_gbl; } }
+#Gt2_Chd= { Function #?1#?3(Str Lgh,Str Spd,Str Vce){ Chd_gbl="#?1#?3"; Pi_Chdlist("#?2","#?4", Lgh,Spd,Vce); Result=Res_gbl; } }
 // "#?2","#?4"が必要
 
 #Chd_list={
@@ -2519,6 +2700,7 @@ Function PI_CHDLIST(Int Rootkey,Str Chdname,Str Junban,Str Cnv,Str Vce){
 #Chd_N={m9}	#Chd_Q={min79}	#Chd_list;
 #Chd_N={9}	#Chd_Q={79}	#Chd_list;
 
+// 差し換え
 #Chd_N={711}	#Chd_Q={7sus4}	#Chd_list;
 #Chd_N={911}	#Chd_Q={9sus4}	#Chd_list;
 #Chd_N={1113}	#Chd_Q={13sus4}	#Chd_list;
@@ -2951,7 +3133,7 @@ Function PI_CHDLIST(Int Rootkey,Str Chdname,Str Junban,Str Cnv,Str Vce){
 //　必要と思われる概要のみここに記しました
 
 
-	
+	 
 　- ストローク / guitar.h互換 - 
 
 
@@ -2963,7 +3145,7 @@ Function PI_CHDLIST(Int Rootkey,Str Chdname,Str Junban,Str Cnv,Str Vce){
 
 　guitar.hはコードが読み込まれると、最終的に o5が書き込まれます。
 　guitar2.hでは混乱を避けるため、コードが読み込まれても、
-　o指定値は変えてはいません。
+　o指定値はそのままとなっています。
 
 
 
@@ -2997,14 +3179,51 @@ Function PI_CHDLIST(Int Rootkey,Str Chdname,Str Junban,Str Cnv,Str Vce){
  
 　- アルペジオ Arpeggio - 
 
-
-//　アルペジオの模式図
-
-
-　　通常アルペジオの、つま弾きの模式図
+//　アルペジオにおけるmml展開、外部コマンドの仕様
 
 
-　　C7({ r32123 r123 }) C7({ r123 r32123 })
+　　アルペジオでは、
+
+　　A("r321") | 'a>ea>d-e<<'
+
+　　S{rrr``e}
+　　S{rr``d-^}
+　　S{r`a^^}
+　　S{rrrr}
+　　　a^^^
+
+　　このように、mml展開をしています。
+
+　　外部コマンドを入れる場合、仕様として
+
+　　A("r (v_+10) 321")
+
+　　S{rrrv_+10``e}
+　　S{rrv_+10``d-^}
+　　S{rv_+10`a^^}
+　　S{rrrrv_+10}
+　　　a^^^v_+10
+
+　　上記のように展開しますが、
+　　Subコマンドの特性上、最下部の" a^^^ "にも、
+　　(v_+10)が適用されてしまいます。
+
+　　これを迂回するためには、内部解決するように記述します。
+
+　　A("r (v_+10) 321(v_-10)")
+
+　　S{rrrv_+10``ev_-10}
+　　S{rrv_+10``d-^v_-10}
+　　S{rv_+10`a^^v_-10}
+　　S{rrrrv_+10v_-10}
+　　　a^^^v_+10v_-10
+
+
+//　アルペジオ内部ループの模式図
+
+　　通常アルペジオの模式図
+
+　　C7("r32123 r123") C7("r123 r32123")
 
 　　| C7:         | C7:
 　      1-----1---|  1-----1---
@@ -3013,44 +3232,15 @@ Function PI_CHDLIST(Int Rootkey,Str Chdname,Str Junban,Str Cnv,Str Vce){
 　  R-------R-----|R----R------
 
 
-　　途切れのないアルペジオの、内部ループ展開模式図
+　　途切れのないアルペジオの模式図
 
-
-　　C7({ [r32123 r123] })
+　　C7("[r32123 r123]")
 
 　　| C7:
 　      1-----1---|----1-----1---
 　     2-2-----2--|---2-2-----2--
 　    3---3-----3-|--3---3-----3-
 　  R-------R-----|R-------R-----
-
-
-
-//　アルペジオにおける、ゲート長の仕様
-
-　　'ac^^'e のような、cだけのばす和音指定は、仕様上できません。
-
-　　アルペジオでは、先行指定でゲートを割り付けている仕様上、
-　　^ は、内部で、r に変換してしまいます。
-
-　　'ac^'e -> 'acr'e // このように出力します
-
-
-　　もし、変換せず、^ のまま処理すると、
-　　サクラのタイは、ゲート長を変更することで対処するため、
-　　以下の様になってしまい、狙った出力を得られないためです
-
-
-　　    1---|        |　　　    1---|        |
-　　2-------|----    |　→　2-------|--------|--------|
-　　r-------|        |　　　r-------|        |
-
-
-
-
-
-
-
   
 */ 
 
