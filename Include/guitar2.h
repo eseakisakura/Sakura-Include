@@ -36,13 +36,9 @@
  Str Res_gbl; // 返値
  Str Chd_gbl; // コード名
  Str Root_gbl; // ルート弦の取得
-
-
-
  
 //	diagram2.h ------ 
-
-	 
+	
 // ERR 
 	
 Function GT2_ERR(Array RR){ // {""},ZZ,.. 
@@ -60,10 +56,8 @@ Function GT2_ERR(Array RR){ // {""},ZZ,..
 
 	Print(ZZ);
 } //func
-
   
 // MML_compile 
-
 	
 Function Loop_Breaker(Str TT,""){ //再帰型 
 
@@ -183,8 +177,6 @@ Function Loop_Breaker(Str TT,""){ //再帰型
 
 // Print( Loop_Breaker("q[e:[h:y]]t[[w:[k]]:r]u[a[b[:c]]][z]q") )
 // q ehyhe t wkkwr wkkw u abcbc abcbc zzq
-
-
  
 Function Speed_Setter(Int Spd, Array Fretting){ 
 
@@ -792,10 +784,10 @@ Function Fret_Mml(Str Selector, Int Barre, Array Fret){ // ab版
 	Num= Barre+ Fret(i)+ Tuning(i)
 
 	NN= Num/12
-	If(Num < 0){ NN= NN- 1 } // [-3/12= 0]
+	If(Num < 0){ NN= NN- 1 } // [0= -3/12]
 
 	DD= Num%12
-	If(DD < 0){ DD= DD+ 12 } //[-3%12= -3]
+	If(DD < 0){ DD= DD+ 12 } //[-3= -3%12]
 
 	If(Selector=="gousei"){
 
@@ -946,7 +938,7 @@ Function Mml_Out(Str Lmm, Str Patch, Str Barre, Array Fret){
 		Switch(Line){
 		Case("prn"){
 
-			For(Int i=0;i<6;i++){ SS= SS+ Fret(i); } //
+			SS= Join_Arr(Fret)
 
 			Print("root:"+ Root_gbl+ " "+ Chd_gbl+ " / "+ Barre+ "fret "+ SS)
 			Print(ZZ)
@@ -1097,7 +1089,7 @@ Function Chdprint(Str Lmm, Str Patch, Str Pos){
 	} //sw
 
 	Barre= Keynote(Rootkey)
-	Barre= Barre_Chk(Barre, Fret)
+	Barre= Barre_Oct(Barre, Fret)
   }
 
   Array GG= ("Nut","1E","2B","3G","4E","5A","6E")
@@ -1110,12 +1102,9 @@ Function Chdprint(Str Lmm, Str Patch, Str Pos){
   Result= Res_gbl;	// Global
 
  } //func
-
-
    
 //	guitar2.h ------ 
-
-	 
+	
 Function Open_Tuning(Str Tune,""){ 
 
 	Array Tuning;
@@ -1173,9 +1162,8 @@ Function Hosei_Root(Int NN, Int DD, Array Fret){
 
 	Result= RR;
 } //func
-
  
-Function Barre_Chk(Int BB, Array FF){ 
+Function Barre_Oct(Int BB, Array FF){ 
 
 	Int NN= 0
 	Int j= 0
@@ -1192,7 +1180,7 @@ Function Barre_Chk(Int BB, Array FF){
 
 	Result= BB
  } //func
- 	
+ 
 Function Pi_Chdlist(Int Rootkey, Str Chdname, Str Lmm, Str Patch, Str Pos){ 
 
 
@@ -1200,12 +1188,12 @@ Function Pi_Chdlist(Int Rootkey, Str Chdname, Str Lmm, Str Patch, Str Pos){
 	Str Number= 0; Array Root_hosei= (0,0);
 	Array Fret; Array Keynote; Array Arr; Array Brr;
 
-/*		1E ``e||   |   |   |
-		2B    ||``c|   |   |
-		3G  `g||   |   |   |
-		4D    ||   | `e|   |
-		5A    ||   |   | `c|
-		6E o3e||   |   |   |
+/*		1E``e||    |    |    |
+		2B    ||``c|    |    |
+		3G `g||    |    |    |
+		4D    ||    | `e|    |
+		5A    ||    |    | `c|
+		6Eo3e||    |    |    |
 		   N   1F      3F
 					C Maj. Position
 					Barre= 0;
@@ -1218,8 +1206,8 @@ Function Pi_Chdlist(Int Rootkey, Str Chdname, Str Lmm, Str Patch, Str Pos){
 
 	// Arr= ("5","5","4","5","6",  "6","6","6","6",  "5","5","5") def.
 
-	// Arr= ("5","5","5","4","5",  "5","6","6","6",  "6","5","5") sumi
-	// 4D:1 | 5A:1 | 6E:2 バレー相対補正値
+	// Arr= ("5","5","5","4","5",  "5","6","6","6",  "6","5","5") hosei
+	// 4D:1 | 5A:1 | 6E:2 バレー相対補正
 
 
 	Case("Maj"){	Arr= ("c5A","5","4","5","6",  "6","6","g6E","6",  "5","5","5")
@@ -1826,24 +1814,22 @@ Function Pi_Chdlist(Int Rootkey, Str Chdname, Str Lmm, Str Patch, Str Pos){
 	} //sw
 
 
-	Root_gbl= Number // Global
-
-	Barre= Barre_Chk(Barre, Fret)
-
-
-
-	Fret= Hosei_Root(Root_hosei(0),Root_hosei(1),Fret)
-
 	If(SizeOf(Fret)!=6){
 
 		GT2_ERR({"Pi_Chdlist: 弦が6つ必要"},SizeOf(Fret) )
 		End;
 	}
 
+	Root_gbl= Number // Global
+
+	Barre= Barre_Oct(Barre, Fret)
+
+	Fret= Hosei_Root(Root_hosei(0),Root_hosei(1),Fret)
+
+
 	Mml_Out(Lmm, Patch, Barre, Fret)
 
  } //func
-
   
 // Chord Functionマクロ 
 
@@ -1941,4 +1927,4 @@ Function Pi_Chdlist(Int Rootkey, Str Chdname, Str Lmm, Str Patch, Str Pos){
 
 #Chd_N={pw2}	#Chd_Q=#Chd_N	#Chd_list;
 #Chd_N={pw3}	#Chd_Q=#Chd_N	#Chd_list;
- 
+ 	
