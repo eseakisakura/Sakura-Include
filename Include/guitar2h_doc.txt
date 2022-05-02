@@ -136,6 +136,8 @@
 		Fret_Mmlでマイナス値に対応した
 		dropのopen_tuningを追加した
 		Speed_Setterを修正した
+
+	5 2		ArpeggioのString_Assginを修正した
  	
 */ 
   
