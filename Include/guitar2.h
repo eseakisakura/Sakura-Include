@@ -344,6 +344,10 @@ Function Cutting(Str Lmm, Str Line, Str Chd, Array Fret){
 		}Case(" "){
 		}Case("|"){
 		}Case(";"){
+		}Case(CHR(9)){ // tab
+		}Case(CHR(10)){ // LF
+		}Case(CHR(13)){ // CR
+
 		}Case("."){ Output= Output+ "."
 		}Case("^"){ Output= Output+ "^"; Length= ""; SW= 25
 		}Case("r"){ Output= Output+ "r"; Length= ""; SW= 25
@@ -370,7 +374,7 @@ Function Cutting(Str Lmm, Str Line, Str Chd, Array Fret){
 	Result= Output
   }
  } //func
- 
+ 	
 Function Fret_Assgin(Array RR){ 
 
 	Array SS= ("r","h","u", "3","2","1")
@@ -712,7 +716,7 @@ Function Arpeggio(Str Lmm, Str Line, Array Fret){
  	Result= Output
   }
  } //func
- 	
+ 
 Function String_Assgin(Str TT,""){ // å∑ì¡ê´ 
 
 	Array RR;
