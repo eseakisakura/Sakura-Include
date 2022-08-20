@@ -560,6 +560,9 @@ Function Arpeggio(Str Lmm, Str Line, Array Fret){
 		}Case(" "){
 		}Case("|"){
 		}Case(";"){
+		}Case(CHR(9)){ // tab
+		}Case(CHR(10)){ // LF
+		}Case(CHR(13)){ // CR
 
 		}Case(CHR(40)){ SW=3; TT= "" // [ ( ]
 
@@ -709,7 +712,7 @@ Function Arpeggio(Str Lmm, Str Line, Array Fret){
  	Result= Output
   }
  } //func
- 
+ 	
 Function String_Assgin(Str TT,""){ // å∑ì¡ê´ 
 
 	Array RR;
