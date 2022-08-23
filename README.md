@@ -14,6 +14,11 @@
 テキスト音楽サクラが起動するならば、読み込めます。<br/>
 説明書は、各ヘッダファイルに内包されています。</h5>
 <br/>
+<h4>
+説明書及び、必須ソフトウェアのリンク <br/>
+・<a href="https://eseakisakura.github.io/sakura_include/"> Sakura Include</a><br/>
+</h4>
+
 <h4>■guitar2.h</h4>
 
 コードネームを記入することで、演奏します。<br/>
