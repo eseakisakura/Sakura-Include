@@ -1,5 +1,4 @@
 Write-host "Hello World!"
-	read-host "pause"
 
 Add-Type -Assembly "System.Runtime"
 
@@ -13,10 +12,12 @@ $cscode = @"
 
 	[DllImport("dSakura.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)]
 	public extern static void GetVerInfo(System.Text.StringBuilder version);
+
 	[DllImport("dSakura.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)]
 	public extern static void SetErrMsgLen(int Len);
 "@
-Add-Type -name ApiFunctions -namespace Win32 -memberDefinition $cscode # -passthru
+
+	Add-Type -name ApiFunctions -namespace Win32 -memberDefinition $cscode # -passthru
 
 	$compilerMessage=New-Object System.Text.StringBuilder(65536)
 	[Win32.ApiFunctions]::SetErrMsgLen($compilerMessage.Capacity)
