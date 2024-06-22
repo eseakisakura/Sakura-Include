@@ -1,10 +1,10 @@
-<h1>Sakura-Include</h1>
+﻿<h1>Sakura-Include</h1>
 
 テキスト音楽サクラのインクルードヘッダです。<br/>
 このファイルをインクルードフォルダに置くことで、拡張機能を<br/>
 使用することができます。<br/>
 <br/>
-<table><tr><td>・guitar2.h</td><td>-- ストローク、カッティング、アルペジオの拡張</td>
+<table><tr><td>・guitar3.h</td><td>-- ストローク、カッティング、アルペジオの拡張</td>
 </tr><tr><td>・tuner2.h</td><td>-- 古典調律変換、マスターチューン変更</td>
 </tr><tr><td>・notecnvt2.h</td><td>-- mmlのキーチェンジ、リバース、鏡像出力</td>
 </tr></table>
@@ -20,12 +20,19 @@
 </h4>
 <br/>
 
-<h4>■guitar2.h</h4>
+<h4>■guitar3.h ver6.5</h4>
 
 コードネームを記入することで、演奏します。<br/>
 例えば、Am7 Dm7 G7 CM7と書き込むと、コードストロークを演奏します。<br/>
 <br/>
 <br/>
+
+<h4>■guitar2.h ver5.0c</h4>
+
+guitar3.hの旧版です。旧曲との互換性のため。<br/>
+<br/>
+<br/>
+
 <h4>■tuner2.h</h4>
 
 GSリセットを使い、古典調律を行います。<br/>
